@@ -26,7 +26,7 @@ public class Booking {
     private Room room; // The room being booked
     @Column(nullable = false, name = "status")
     private Status status;
-    @Column(nullable = false, name = "bookingDate")
+    @Column(nullable = false, name = "booking_date")
     private Date bookingDate; // Date when the booking was made
 
 

@@ -17,16 +17,16 @@ public class Hostel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true, name = "id")
     private Long id;
-    @Column(nullable = false, name = "hostelName")
+    @Column(nullable = false, name = "hostel_name")
     private String name;
     @Column(nullable = false, name = "address")
     private String address;
     @Column(nullable = false, name = "description")
     private String description;
     //    private String imageUrl;
-    @Column(nullable = false, name = "totalRooms")
+    @Column(nullable = false, name = "total_rooms")
     private int totalRooms;
-    @Column(nullable = false, name = "availableRooms")
+    @Column(nullable = false, name = "available_rooms")
     private int availableRooms;
     @OneToMany(mappedBy = "hostel", cascade = CascadeType.ALL, orphanRemoval = true)
     // This field is used to track the rooms in the hostel
