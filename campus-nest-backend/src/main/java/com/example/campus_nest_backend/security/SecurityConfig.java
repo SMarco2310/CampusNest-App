@@ -24,7 +24,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // allow login/signup endpoints
+                        .requestMatchers("/api/auth/login","/api/auth/register").permitAll() // allow login/signup endpoints
                         .requestMatchers("/admin/**","/api/users/delete","/api/users/").hasRole("ADMIN") // admin endpoints
                         .requestMatchers("/api/users/update").hasAnyRole("STUDENT") // user endpoints
                         .requestMatchers("/api/hostels/all","/api/hostels/details","/api/rooms/details/","/api/rooms/").permitAll() // public endpoints

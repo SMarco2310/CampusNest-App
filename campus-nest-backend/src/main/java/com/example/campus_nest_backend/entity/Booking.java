@@ -25,10 +25,9 @@ public class Booking {
     @JoinColumn(name = "room_id", nullable = false)
     private Room room; // The room being booked
     @Column(nullable = false, name = "status")
-    private Status status;
+    private Status status = Status.PENDING;
     @Column(nullable = false, name = "booking_date")
     private Date bookingDate; // Date when the booking was made
-
 
     public Booking() {
     }

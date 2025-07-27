@@ -24,7 +24,7 @@ public class UserController {
 
     // This method retrieves all users from the database.
 
-    @GetMapping("/all")
+    @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUsers() {
 
         return ResponseEntity.ok(userService.getAllUsers()); // Return 200 OK with the list of users

@@ -20,7 +20,7 @@ public class HostelController {
     }
 
     // This method retrieves all hostels from the database.
-    @GetMapping("/all")
+    @GetMapping("/hostels")
     public ResponseEntity<List<Hostel>> getAllHostels() {
         return  ResponseEntity.ok(hostelService.getAllHostels());
     }
