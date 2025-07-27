@@ -21,7 +21,7 @@ public class Room {
     @Column(nullable = false, name = "capacity")
     private int capacity; // Maximum number of occupants in the room
     @Column(nullable = false, name = "current_occupancy")
-    private int currentOccupancy; // Current number of occupants in the room
+    private int currentOccupancy = 0; // Current number of occupants in the room
     @Column(nullable = false, name = "price_per_bed")
     private double pricePerBed; // Price per bed in the room
     @Column(nullable = false, name = "description")
@@ -30,7 +30,7 @@ public class Room {
     @JoinColumn(name = "hostel_id", nullable = false)
     private Hostel hostel; // The hostel to which the room belongs
     @Column(nullable = false, name = "is_available")
-    private boolean isAvailable; // Availability status of the room
+    private boolean isAvailable = true; // Availability status of the room
     // This field is used to track the occupants of the room
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
     List<User> occupants = new ArrayList<>(); // List of users currently occupying the room
@@ -38,6 +38,10 @@ public class Room {
     @CollectionTable(name = "room_image_urls", joinColumns = @JoinColumn(name = "room_id"))
     @Column(name = "image_url")
     private List<String> imageUrls = new ArrayList<>();
+    @ElementCollection
+    @CollectionTable(name = "room_amenities", joinColumns = @JoinColumn(name = "room_id"))
+    @Column(name = "amenity")
+    private List<String> amenities = new ArrayList<>(); // List of amenities available in the room
 
 
     public Room() {

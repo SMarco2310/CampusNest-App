@@ -1,0 +1,49 @@
+package com.example.campus_nest_backend.controller;
+
+
+import com.example.campus_nest_backend.entity.User;
+import com.example.campus_nest_backend.service.UserService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+
+import java.util.List;
+
+@Controller("api/users")
+public class UserController {
+
+    private final  UserService userService;
+
+    public UserController(UserService userService) {
+
+        this.userService = userService;
+    }
+
+    // This method retrieves all users from the database.
+
+    @GetMapping("/")
+    public ResponseEntity<List<User>> getAllUsers() {
+
+        return ResponseEntity.ok(userService.getAllUsers()); // Return 200 OK with the list of users
+    }
+
+    // This method retrieves a user by their ID.
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUserById( @PathVariable String id) {
+        return ResponseEntity.ok(userService.getUserById(Long.valueOf(id)));
+    }
+    // This method deletes a user by their ID.
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
+        userService.deleteUser(Long.valueOf(id));
+        return ResponseEntity.noContent().build(); // Return 204 No Content after deletion
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable String id, User userDetails) {
+        return ResponseEntity.ok(userService.updateUser(Long.valueOf(id), userDetails));
+    }
+}

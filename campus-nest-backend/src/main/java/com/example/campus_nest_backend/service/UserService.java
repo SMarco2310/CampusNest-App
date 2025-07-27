@@ -1,12 +1,15 @@
 package com.example.campus_nest_backend.service;
 
+import com.example.campus_nest_backend.dto.SignUpRequest;
 import com.example.campus_nest_backend.entity.User;
 import com.example.campus_nest_backend.repository.UserRepository;
+import com.example.campus_nest_backend.utils.Role;
+import com.example.campus_nest_backend.utils.utils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
+import com.example.campus_nest_backend.utils.utils.*;
 import java.util.List;
 
 
@@ -24,10 +27,44 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
+    public User createUser(SignUpRequest signUpRequest) {
+        User user = new User();
+        // This method saves a new user to the database.
+        user.setName(signUpRequest.getName());
+        user.setEmail(signUpRequest.getEmail());
+        user.setPassword(utils.passwordEncoder.encode(signUpRequest.getPassword()));
+        user.setPhone(signUpRequest.getPhone());
+        user.setRole(Role.valueOf(signUpRequest.getRole()));
+        return userRepository.save(user);
+    }
+
+//    Have to go through this  again to check the password encoding and other details
+
+    public User updateUser(Long id, User userDetails) {
+        // This method updates an existing user in the database
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            throw  new UsernameNotFoundException("User not found");
+        }
+        user.setName(userDetails.getName());
+        user.setEmail(userDetails.getEmail());
+        user.setPassword(userDetails.getPassword());
+        user.setPhone(userDetails.getPhone());
+        user.setRole(userDetails.getRole());
+        return userRepository.save(user);
+
+    }
+
+    public void deleteUser(Long id) {
+        // This method deletes a user by their ID.
+        userRepository.deleteById(id);
+    }
+
     public User getUserById(Long id) {
         // This method retrieves a user by their ID.
         return userRepository.findById(id).orElse(null);
     }
+
 
 
     // This method is used to load user details by username.

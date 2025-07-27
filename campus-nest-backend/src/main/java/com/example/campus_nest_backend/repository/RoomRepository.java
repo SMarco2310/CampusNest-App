@@ -1,4 +1,7 @@
 package com.example.campus_nest_backend.repository;
 
-public interface RoomRepository {
+import com.example.campus_nest_backend.entity.Room;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface RoomRepository extends JpaRepository<Room, Long> {
 }

@@ -23,11 +23,10 @@ public class Hostel {
     private String address;
     @Column(nullable = false, name = "description")
     private String description;
-    //    private String imageUrl;
     @Column(nullable = false, name = "total_rooms")
-    private int totalRooms;
+    private int totalRooms =0;
     @Column(nullable = false, name = "available_rooms")
-    private int availableRooms;
+    private int availableRooms = 0; // Number of rooms available for booking
     @OneToMany(mappedBy = "hostel", cascade = CascadeType.ALL, orphanRemoval = true)
     // This field is used to track the rooms in the hostel
     private List<Room> rooms = new ArrayList<>();
