@@ -25,20 +25,20 @@ public class HostelController {
         return  ResponseEntity.ok(hostelService.getAllHostels());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/hostel/{id}")
     public ResponseEntity<Hostel> getHostelById(@PathVariable Long id) {
         return   ResponseEntity.ok(hostelService.getHostelById(id));
     }
 
-    @PostMapping("/")
+    @PostMapping("/create")
     public ResponseEntity<Hostel> createHostel(HostelRequest hostelRequest) {
         return ResponseEntity.ok(hostelService.createHostel(hostelRequest));
     }
-    @PutMapping("/{id}")
+    @PutMapping("/hostel/{id}")
     public ResponseEntity<Hostel> updateHostel(@PathVariable Long id, HostelRequest hostelRequest) {
         return ResponseEntity.ok(hostelService.updateHostel(id, hostelRequest));
     }
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/hostel/{id}")
     public ResponseEntity<?> deleteHostel(@PathVariable Long id) {
         hostelService.deleteHostel(id);
         return ResponseEntity.ok("Hostel deleted successfully");

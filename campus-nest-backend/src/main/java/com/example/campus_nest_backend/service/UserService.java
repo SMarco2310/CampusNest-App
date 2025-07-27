@@ -1,5 +1,6 @@
 package com.example.campus_nest_backend.service;
 
+import com.example.campus_nest_backend.dto.LoginRequest;
 import com.example.campus_nest_backend.dto.SignUpRequest;
 import com.example.campus_nest_backend.entity.User;
 import com.example.campus_nest_backend.repository.UserRepository;
@@ -82,5 +83,14 @@ public class UserService implements UserDetailsService {
                 .password(user.getPassword())
                 .roles(user.getRole().name())
                 .build();
+    }
+
+    public User authenticateUser(LoginRequest loginRequest) {
+        // This method authenticates a user using their email and password.
+        User user = userRepository.findByEmail(loginRequest.getEmail());
+        if (user == null || !utils.passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+            throw new UsernameNotFoundException("Invalid email or password");
+        }
+        return user;
     }
 }
