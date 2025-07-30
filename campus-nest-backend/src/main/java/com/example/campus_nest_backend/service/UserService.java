@@ -3,6 +3,7 @@ package com.example.campus_nest_backend.service;
 import com.example.campus_nest_backend.dto.LoginRequest;
 import com.example.campus_nest_backend.dto.SignUpRequest;
 import com.example.campus_nest_backend.entity.User;
+import com.example.campus_nest_backend.exception.UserNotFoundException;
 import com.example.campus_nest_backend.repository.UserRepository;
 import com.example.campus_nest_backend.utils.Role;
 import com.example.campus_nest_backend.utils.utils;
@@ -45,28 +46,29 @@ public class UserService implements UserDetailsService {
         // This method updates an existing user in the database
         User user = userRepository.findById(id).orElse(null);
         if (user == null) {
-            throw  new UsernameNotFoundException("User not found");
+            throw  new UserNotFoundException("User not found");
         }
         user.setName(userDetails.getName());
         user.setEmail(userDetails.getEmail());
         user.setPassword(userDetails.getPassword());
         user.setPhone(userDetails.getPhone());
         user.setRole(userDetails.getRole());
+        user.setProfilePicture(userDetails.getProfilePicture());
         return userRepository.save(user);
 
     }
 
     public void deleteUser(Long id) {
-        // This method deletes a user by their ID.
         userRepository.deleteById(id);
     }
 
     public User getUserById(Long id) {
-        // This method retrieves a user by their ID.
         return userRepository.findById(id).orElse(null);
     }
 
+        /*
 
+         */
 
     // This method is used to load user details by username.
     @Override
@@ -75,7 +77,7 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findByEmail(email);
         // If user is not found, throw an exception
         if (userRepository.existsByEmail(email)) {
-            throw new UsernameNotFoundException("User not found with email: " + email);
+            throw new UserNotFoundException("User not found with email: " + email);
         }
         // Return the user details
         return org.springframework.security.core.userdetails.User
@@ -89,7 +91,7 @@ public class UserService implements UserDetailsService {
         // This method authenticates a user using their email and password.
         User user = userRepository.findByEmail(loginRequest.getEmail());
         if (user == null || !utils.passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            throw new UsernameNotFoundException("Invalid email or password");
+            throw new UserNotFoundException("Invalid email or password");
         }
         return user;
     }

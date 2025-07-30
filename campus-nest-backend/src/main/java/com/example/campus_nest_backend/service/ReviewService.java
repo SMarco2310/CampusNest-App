@@ -1,7 +1,9 @@
 package com.example.campus_nest_backend.service;
 
 import com.example.campus_nest_backend.dto.ReviewRequest;
+import com.example.campus_nest_backend.entity.Hostel;
 import com.example.campus_nest_backend.entity.Review;
+import com.example.campus_nest_backend.exception.ResourceNotFoundException;
 import com.example.campus_nest_backend.repository.HostelRepository;
 import com.example.campus_nest_backend.repository.ReviewRepository;
 import com.example.campus_nest_backend.repository.UserRepository;
@@ -24,7 +26,7 @@ public class ReviewService {
     public Review getReviewById(Long id) {
         Review review = reviewRepository.findReviewById(id);
         if (review == null) {
-            throw new RuntimeException("The review with this  Id does not exist");
+            throw new ResourceNotFoundException("The review with this  Id does not exist");
         }
         return review;
     }
@@ -49,7 +51,8 @@ public class ReviewService {
 
 
     public List<Review> getReviewsByHostelId(Long hostelId) {
-        return reviewRepository.findReviewsByHostelId(hostelId);
+        Hostel hostel = hostelRepository.getHostelById(hostelId);
+        return hostel.getReviews();
     }
 
     public void deleteReview(Long id) {

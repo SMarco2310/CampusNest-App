@@ -18,6 +18,7 @@ public class Hostel {
     @Column(nullable = false, unique = true, name = "id")
     private Long id;
     @Column(nullable = false, name = "hostel_name")
+
     private String name;
     @Column(nullable = false, name = "address")
     private String address;
@@ -26,7 +27,7 @@ public class Hostel {
     @Column(nullable = false, name = "total_rooms")
     private int totalRooms =0;
     @Column(nullable = false, name = "available_rooms")
-    private int availableRooms = 0; // Number of rooms available for booking
+    private int availableRooms = totalRooms; // Number of rooms available for booking
     @OneToMany(mappedBy = "hostel", cascade = CascadeType.ALL, orphanRemoval = true)
     // This field is used to track the rooms in the hostel
     private List<Room> rooms = new ArrayList<>();
@@ -37,6 +38,9 @@ public class Hostel {
     @CollectionTable(name = "hostel_image_urls", joinColumns = @JoinColumn(name = "hostel_id"))
     @Column(name = "image_url")
     private List<String> imageUrls = new ArrayList<>();
+    @OneToMany(mappedBy = "hostel", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
+
 
     public Hostel() {
     }

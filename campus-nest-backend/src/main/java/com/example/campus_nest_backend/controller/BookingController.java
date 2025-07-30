@@ -33,7 +33,7 @@ public class BookingController {
 
     @PostMapping("/booking")
     public ResponseEntity<?> createBooking(@Valid @RequestBody BookingRequest bookingRequest) {
-        return ResponseEntity.ok(Map.of("booking",bookingService.createBooking(bookingRequest),"message","Room successfully booked"));
+        return ResponseEntity.ok(Map.of("booking",bookingService.bookRoom(bookingRequest),"message","Room successfully booked"));
     }
 
     @PutMapping("/update/booking/{id}")

@@ -27,6 +27,9 @@ public class User {
     private String phone;
     @Column(nullable = false, name = "Role")
     private Role role = Role.STUDENT; // Default role is STUDENT
+    @Column(nullable = true,name = "profile_picture")
+    private String profilePicture;
+    // Relation to keep track of how many booking, review and room the user has
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Booking> bookings = new ArrayList<>();
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

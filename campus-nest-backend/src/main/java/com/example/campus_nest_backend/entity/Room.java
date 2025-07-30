@@ -19,7 +19,7 @@ public class Room {
     @Column(nullable = false, name = "room_number")
     private String roomNumber; // Room number or identifier
     @Column(nullable = false, name = "capacity")
-    private int capacity; // Maximum number of occupants in the room
+    private int capacity = 0; // Maximum number of occupants in the room
     @Column(nullable = false, name = "current_occupancy")
     private int currentOccupancy = 0; // Current number of occupants in the room
     @Column(nullable = false, name = "price_per_bed")

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Booking Confirmation</title>
+</head>
+<body>
+<h2>Thank you for booking with us!</h2>
+<p>Hi <strong th:text="${name}"></strong>,</p>
+<p>Your booking for room <strong th:text="${roomNumber}"></strong> in hostel <strong th:text="${hostelName}"></strong> has been confirmed.</p>
+<p>Booking Date: <span th:text="${bookingDate}"></span></p>
+<p>We look forward to hosting you!</p>
+</body>
+</html>

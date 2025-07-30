@@ -3,52 +3,63 @@ package com.example.campus_nest_backend.service;
 import com.example.campus_nest_backend.dto.NewRoomRequest;
 import com.example.campus_nest_backend.entity.Hostel;
 import com.example.campus_nest_backend.entity.Room;
+import com.example.campus_nest_backend.entity.User;
+import com.example.campus_nest_backend.exception.HostelNotFoundException;
+import com.example.campus_nest_backend.exception.RoomNotFoundException;
 import com.example.campus_nest_backend.repository.HostelRepository;
 import com.example.campus_nest_backend.repository.RoomRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+
 @Service
+@RequiredArgsConstructor
 public class RoomService {
 
     private final HostelRepository hostelRepository;
     private final RoomRepository roomRepository;
-
-    public RoomService(HostelRepository hostelRepository, RoomRepository roomRepository) {
-        this.hostelRepository = hostelRepository;
-        this.roomRepository = roomRepository;
-    }
-
+    @Transactional
     public void createRoom(NewRoomRequest newRoomRequest) {
+        Hostel hostel = hostelRepository.findById(newRoomRequest.getHostelId())
+                .orElseThrow(() -> new HostelNotFoundException("Hostel not found with ID: " + newRoomRequest.getHostelId()));
+        hostel.setTotalRooms(hostel.getTotalRooms() + 1);
         Room room = new Room();
+        if (newRoomRequest.getCapacity() < 1) {
+            throw new IllegalArgumentException("Room capacity must be at least 1");
+        }
         room.setRoomNumber(newRoomRequest.getRoomNumber());
         room.setCapacity(newRoomRequest.getCapacity());
-        room.setHostel(hostelRepository.getHostelById(newRoomRequest.getHostelId()));
-        if (room.getHostel() == null) {
-            throw new RuntimeException("Hostel not found with ID: " + newRoomRequest.getHostelId());
-        }
-        // Set other room properties from the request
+        room.setHostel(hostel);
         room.setPricePerBed(newRoomRequest.getPricePerBed());
         room.setDescription(newRoomRequest.getDescription());
         room.setAmenities(newRoomRequest.getAmenities());
         room.setImageUrls(newRoomRequest.getImages());
-        // Save the room to the database
+
         roomRepository.save(room);
     }
 
+
+    public List<User> getUsersInRoom(Long roomId) {
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new RoomNotFoundException("Room with the id " +roomId + "Not found."));
+        return room.getOccupants();
+    }
+
+    @Transactional
     public Room updateRoom(Long roomId, NewRoomRequest newRoomRequest) {
         // Fetch the existing room by ID
         Room existingRoom = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("Room not found with ID: " + roomId));
 
+        Hostel hostel = hostelRepository.findById(newRoomRequest.getHostelId())
+                .orElseThrow(() -> new HostelNotFoundException("Hostel not found with ID: " + newRoomRequest.getHostelId()));
+        existingRoom.setHostel(hostel);
         // Update the room properties
         existingRoom.setRoomNumber(newRoomRequest.getRoomNumber());
         existingRoom.setCapacity(newRoomRequest.getCapacity());
-        existingRoom.setHostel(hostelRepository.getHostelById(newRoomRequest.getHostelId()));
-        if (existingRoom.getHostel() == null) {
-            throw new RuntimeException("Hostel not found with ID: " + newRoomRequest.getHostelId());
-        }
+        existingRoom.setHostel(hostel);
         existingRoom.setPricePerBed(newRoomRequest.getPricePerBed());
         existingRoom.setDescription(newRoomRequest.getDescription());
         existingRoom.setAmenities(newRoomRequest.getAmenities());
@@ -66,18 +77,38 @@ public class RoomService {
 
     // Example method to fetch rooms by hostel ID
     public List<Room> getRoomsByHostelId(Long hostelId) {
-        List<Room> rooms =hostelRepository.findById(hostelId)
-                .map(Hostel::getRooms).orElse(null);
-        if(rooms==null){
-            throw new RuntimeException("Hostel not found with ID: " + hostelId);
-        }
-        return rooms;
-    }
+        Hostel hostel = hostelRepository.findById(hostelId)
+                .orElseThrow(() -> new HostelNotFoundException("Hostel not found with ID: " + hostelId));
 
+        return hostel.getRooms();
+    }
+    @Transactional
     public void deleteRoom(Long roomId) {
         // Delete the room by ID from the repository
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new RoomNotFoundException("Room not found with ID: " + roomId));
+        if (!room.getOccupants().isEmpty()) {
+            throw new RuntimeException("Cannot delete room with occupants.");
+        }
+        Hostel hostel = room.getHostel();
+        hostel.setTotalRooms(hostel.getTotalRooms() - 1);
         roomRepository.deleteById(roomId);
     }
 
+    public void save(Room room) {
+        roomRepository.save(room);
+    }
 
+
+//    I could use this to sync the room counts in hostels periodically, but it is commented out for now.
+
+
+//    @Scheduled(cron = "0 0 * * * ?") // every hour
+//public void syncRoomCounts() {
+//    hostelRepository.findAll().forEach(hostel -> {
+//        int actualRoomCount = hostel.getRooms().size();
+//        hostel.setTotalRooms(actualRoomCount);
+//        hostelRepository.save(hostel);
+//    });
+//}
 }
