@@ -13,7 +13,7 @@ public class JwtService {
 
     @Value("${jwt.secret}")
     private String SECRET_KEY;
-    private final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hour
+    private final long EXPIRATION_TIME = 1000 * 60 * 60*12; // 1 hour
 
     // Generate token
     public String generateToken(String username, String role) {

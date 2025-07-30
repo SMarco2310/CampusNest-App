@@ -30,7 +30,7 @@ public class SecurityConfig {
                                 "/api/auth/**",
                                 "/api/hostels/hostels",          // GET all hostels
                                 "/api/hostels/details/{hostelId}", // GET hostel details
-                                "/api/rooms/{hostelId}",           // GET rooms by hostel
+                                "/api/rooms/rooms/{hostelId}",           // GET rooms by hostel
                                 "/api/rooms/details/{roomId}"      // GET room details
                         ).permitAll()
 //

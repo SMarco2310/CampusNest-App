@@ -25,24 +25,25 @@ public class RoomController {
         return ResponseEntity.ok(Map.of("message","Room added successfully","room", roomService.createRoom(newRoomRequest)));
     }
 
-    @GetMapping("/{hostelId}")
-    public ResponseEntity<?> getRooms(@PathVariable String hostelId) {
-        return ResponseEntity.ok(Map.of("rooms",roomService.getRoomsByHostelId(Long.parseLong(hostelId))));
+    @GetMapping("/rooms/{hostelId}")
+    public ResponseEntity<?> getRooms(@PathVariable
+                                      Long hostelId) {
+        return ResponseEntity.ok(Map.of("rooms",roomService.getRoomsByHostelId(hostelId)));
     }
 
     @GetMapping("/details/{roomId}")
-    public ResponseEntity<?> getRoomDetails(@PathVariable String roomId) {
-        return ResponseEntity.ok(Map.of("room",roomService.getRoomById(Long.parseLong(roomId))));
+    public ResponseEntity<?> getRoomDetails(@PathVariable Long roomId) {
+        return ResponseEntity.ok(Map.of("room",roomService.getRoomById(roomId)));
     }
 
     @PutMapping("/update/room/{roomId}")
-    public ResponseEntity<?> updateRoom(@PathVariable String roomId, NewRoomRequest newRoomRequest ) {
-        return ResponseEntity.ok(Map.of("room",roomService.updateRoom(Long.parseLong(roomId), newRoomRequest)));
+    public ResponseEntity<?> updateRoom(@PathVariable Long roomId, @RequestBody NewRoomRequest newRoomRequest ) {
+        return ResponseEntity.ok(Map.of("room",roomService.updateRoom(roomId, newRoomRequest)));
     }
 
     @DeleteMapping("/delete/room/{roomId}")
-    public ResponseEntity<?> deleteRoom(@PathVariable String roomId) {
-        roomService.deleteRoom(Long.parseLong(roomId));
+    public ResponseEntity<?> deleteRoom(@PathVariable Long roomId) {
+        roomService.deleteRoom(roomId);
         return ResponseEntity.ok(Map.of("message","Room deleted successfully")); // Return 204 No Content after deletion
     }
 

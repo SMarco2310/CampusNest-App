@@ -30,6 +30,11 @@ public class RoomService {
         if (newRoomRequest.getCapacity() < 1) {
             throw new IllegalArgumentException("Room capacity must be at least 1");
         }
+        hostel.setAvailableRooms(
+                (int) hostel.getRooms().stream()
+                        .filter(Room::isAvailable)
+                        .count()
+        );
         room.setRoomNumber(newRoomRequest.getRoomNumber());
         room.setCapacity(newRoomRequest.getCapacity());
         room.setHostel(hostel);
@@ -92,6 +97,11 @@ public class RoomService {
             throw new RuntimeException("Cannot delete room with occupants.");
         }
         Hostel hostel = room.getHostel();
+        hostel.setAvailableRooms(
+                (int) hostel.getRooms().stream()
+                        .filter(Room::isAvailable)
+                        .count()
+        );
         hostel.setTotalRooms(hostel.getTotalRooms() - 1);
         roomRepository.deleteById(roomId);
     }
