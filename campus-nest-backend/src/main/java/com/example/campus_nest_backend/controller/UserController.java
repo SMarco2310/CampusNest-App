@@ -5,14 +5,12 @@ import com.example.campus_nest_backend.entity.User;
 import com.example.campus_nest_backend.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller("api/users")
+@RestController
+@RequestMapping("/api/users")
 public class UserController {
 
     private final  UserService userService;

@@ -1,18 +1,18 @@
 package com.example.campus_nest_backend.controller;
 
 import com.example.campus_nest_backend.dto.ReviewRequest;
-import com.example.campus_nest_backend.entity.Hostel;
 import com.example.campus_nest_backend.entity.Review;
 import com.example.campus_nest_backend.service.ReviewService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
-@Controller("/api/review")
+
+@RestController
+@RequestMapping("/api/review")
 public class ReviewController {
 
     private final ReviewService reviewService;

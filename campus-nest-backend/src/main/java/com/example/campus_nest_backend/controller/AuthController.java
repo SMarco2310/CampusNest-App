@@ -7,12 +7,15 @@ import com.example.campus_nest_backend.entity.User;
 import com.example.campus_nest_backend.security.JwtService;
 import com.example.campus_nest_backend.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
-@Controller("api/auth")
+@RestController
+@RequestMapping("/api/auth")
 public class AuthController {
 
     private final UserService userService;
@@ -27,7 +30,7 @@ public class AuthController {
 
     // This method handles user login requests.
     @PostMapping("/login")
-    public ResponseEntity<?> login(LoginRequest loginRequest) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         // Authenticate the user using the UserService.
         User user = userService.authenticateUser(loginRequest);
         if (user == null) {
@@ -41,7 +44,7 @@ public class AuthController {
 
     @PostMapping("/register")
     // This method handles user registration requests.
-    public ResponseEntity<?> register(SignUpRequest signUpRequest) {
+    public ResponseEntity<?> register(@RequestBody SignUpRequest signUpRequest) {
         User user =userService.createUser(signUpRequest);
         String token =jwtService.generateToken(signUpRequest.getEmail(), signUpRequest.getRole());
         // After creating a user, generate a JWT token for the user.
