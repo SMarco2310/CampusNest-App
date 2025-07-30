@@ -34,36 +34,36 @@ public class SecurityConfig {
                                 "/api/rooms/details/{roomId}"      // GET room details
                         ).permitAll()
 //
-//                        // Admin-only endpoints
-//                        .requestMatchers(
-//                                "/api/users/users",                // GET all users
-//                                "/api/users/delete/{userId}",      // DELETE user
-//                                "/api/users/update/{userId}"       // PUT update user
-//                        ).hasRole("ADMIN")
-//
-//                        // Hostel manager endpoints
-//                        .requestMatchers(
-//                                "/api/hostels/create",             // POST create hostel
-//                                "/api/hostels/hostel/{hostelId}",  // PUT update hostel
-//                                "/api/hostels/delete/{hostelId}",  // DELETE hostel
-//                                "/api/rooms/add",                  // POST add room
-//                                "/api/rooms/update/room/{roomId}", // PUT update room
-//                                "/api/rooms/delete/room/{roomId}"  // DELETE room
-//                        ).hasRole("HOSTEL_MANAGER")
-//
-//                        // User-specific endpoints
-//                        .requestMatchers(
-//                                "/api/users/{userId}",             // GET user by ID
-//                                "/api/bookings/bookings/{userId}", // GET user bookings
-//                                "/api/bookings/booking",           // POST create booking
-//                                "/api/bookings/update/booking/{id}", // PUT update booking
-//                                "/api/bookings/delete/booking/{id}", // DELETE booking
-//                                "/api/review/{hostelId}/reviews",  // GET reviews by hostel
-//                                "/api/review/review/{id}",         // GET review by ID
-//                                "/api/review/review",              // POST add review
-//                                "/api/review/review/{id}",        // PUT update review
-//                                "/api/review/review/{id}"         // DELETE review
-//                        ).hasAnyRole("STUDENT", "HOSTEL_MANAGER", "ADMIN")
+                        // Admin-only endpoints
+                        .requestMatchers(
+                                "/api/users/users",                // GET all users
+                                "/api/users/delete/{userId}",      // DELETE user
+                                "/api/users/update/{userId}"       // PUT update user
+                        ).hasRole("ADMIN")
+
+                        // Hostel manager endpoints
+                        .requestMatchers(
+                                "/api/hostels/create",             // POST create hostel
+                                "/api/hostels/hostel/{hostelId}",  // PUT update hostel
+                                "/api/hostels/delete/{hostelId}",  // DELETE hostel
+                                "/api/rooms/add",                  // POST add room
+                                "/api/rooms/update/room/{roomId}", // PUT update room
+                                "/api/rooms/delete/room/{roomId}"  // DELETE room
+                        ).hasRole("HOSTEL_MANAGER")
+
+                        // User-specific endpoints
+                        .requestMatchers(
+                                "/api/users/{userId}",             // GET user by ID
+                                "/api/bookings/bookings/{userId}", // GET user bookings
+                                "/api/bookings/booking",           // POST create booking
+                                "/api/bookings/update/booking/{id}", // PUT update booking
+                                "/api/bookings/delete/booking/{id}", // DELETE booking
+                                "/api/review/{hostelId}/reviews",  // GET reviews by hostel
+                                "/api/review/review/{id}",         // GET review by ID
+                                "/api/review/review",              // POST add review
+                                "/api/review/review/{id}",        // PUT update review
+                                "/api/review/review/{id}"         // DELETE review
+                        ).hasAnyRole("STUDENT", "HOSTEL_MANAGER", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess

@@ -22,7 +22,7 @@ public class RoomService {
     private final HostelRepository hostelRepository;
     private final RoomRepository roomRepository;
     @Transactional
-    public void createRoom(NewRoomRequest newRoomRequest) {
+    public Room createRoom(NewRoomRequest newRoomRequest) {
         Hostel hostel = hostelRepository.findById(newRoomRequest.getHostelId())
                 .orElseThrow(() -> new HostelNotFoundException("Hostel not found with ID: " + newRoomRequest.getHostelId()));
         hostel.setTotalRooms(hostel.getTotalRooms() + 1);
@@ -39,6 +39,7 @@ public class RoomService {
         room.setImageUrls(newRoomRequest.getImages());
 
         roomRepository.save(room);
+        return room;
     }
 
 

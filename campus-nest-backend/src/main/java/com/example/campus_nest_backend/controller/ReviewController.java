@@ -24,8 +24,8 @@ public class ReviewController {
 
 
     @GetMapping("/{hostelId}/reviews")
-    public ResponseEntity<List<Review>> getReviewByHostelId(@Valid @PathVariable Long hostelId){
-        return ResponseEntity.ok(reviewService.getReviewsByHostelId(hostelId));
+    public ResponseEntity<?> getReviewByHostelId(@Valid @PathVariable Long hostelId){
+        return ResponseEntity.ok(Map.of("reviews",reviewService.getReviewsByHostelId(hostelId)));
     }
 
     @GetMapping("/review/{id}")

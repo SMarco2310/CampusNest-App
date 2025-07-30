@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/rooms")
@@ -20,30 +21,29 @@ public class RoomController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addRoom(NewRoomRequest newRoomRequest) {
-        roomService.createRoom(newRoomRequest);
-        return ResponseEntity.ok("Room added successfully");
+    public ResponseEntity<?> addRoom(@RequestBody NewRoomRequest newRoomRequest) {
+        return ResponseEntity.ok(Map.of("message","Room added successfully","room", roomService.createRoom(newRoomRequest)));
     }
 
     @GetMapping("/{hostelId}")
-    public ResponseEntity<List<Room>> getRooms(@PathVariable String hostelId) {
-        return ResponseEntity.ok(roomService.getRoomsByHostelId(Long.parseLong(hostelId)));
+    public ResponseEntity<?> getRooms(@PathVariable String hostelId) {
+        return ResponseEntity.ok(Map.of("rooms",roomService.getRoomsByHostelId(Long.parseLong(hostelId))));
     }
 
     @GetMapping("/details/{roomId}")
-    public ResponseEntity<Room> getRoomDetails(@PathVariable String roomId) {
-        return ResponseEntity.ok(roomService.getRoomById(Long.parseLong(roomId)));
+    public ResponseEntity<?> getRoomDetails(@PathVariable String roomId) {
+        return ResponseEntity.ok(Map.of("room",roomService.getRoomById(Long.parseLong(roomId))));
     }
 
     @PutMapping("/update/room/{roomId}")
-    public ResponseEntity<Room> updateRoom(@PathVariable String roomId, NewRoomRequest newRoomRequest ) {
-        return ResponseEntity.ok(roomService.updateRoom(Long.parseLong(roomId), newRoomRequest));
+    public ResponseEntity<?> updateRoom(@PathVariable String roomId, NewRoomRequest newRoomRequest ) {
+        return ResponseEntity.ok(Map.of("room",roomService.updateRoom(Long.parseLong(roomId), newRoomRequest)));
     }
 
     @DeleteMapping("/delete/room/{roomId}")
     public ResponseEntity<?> deleteRoom(@PathVariable String roomId) {
         roomService.deleteRoom(Long.parseLong(roomId));
-        return ResponseEntity.ok("Room deleted successfully"); // Return 204 No Content after deletion
+        return ResponseEntity.ok(Map.of("message","Room deleted successfully")); // Return 204 No Content after deletion
     }
 
 }

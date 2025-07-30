@@ -9,9 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 
-@Controller("api/hostels")
+@RestController
+@RequestMapping("/api/hostels")
 public class HostelController {
 
     private final HostelService hostelService;
@@ -21,27 +22,27 @@ public class HostelController {
 
     // This method retrieves all hostels from the database.
     @GetMapping("/hostels")
-    public ResponseEntity<List<Hostel>> getAllHostels() {
-        return  ResponseEntity.ok(hostelService.getAllHostels());
+    public ResponseEntity<?> getAllHostels() {
+        return  ResponseEntity.ok(Map.of("hostels",hostelService.getAllHostels()));
     }
 
     @GetMapping("/details/{hostelId}")
-    public ResponseEntity<Hostel> getHostelById(@PathVariable Long hostelId) {
-        return   ResponseEntity.ok(hostelService.getHostelById(hostelId));
+    public ResponseEntity<?> getHostelById(@PathVariable Long hostelId) {
+        return   ResponseEntity.ok(Map.of("hostel",hostelService.getHostelById(hostelId)));
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Hostel> createHostel(HostelRequest hostelRequest) {
-        return ResponseEntity.ok(hostelService.createHostel(hostelRequest));
+    public ResponseEntity<?> createHostel(@RequestBody HostelRequest hostelRequest) {
+        return ResponseEntity.ok(Map.of("hostel", hostelService.createHostel(hostelRequest)));
     }
     @PutMapping("/hostel/{hostelId}")
-    public ResponseEntity<Hostel> updateHostel(@PathVariable Long hostelId, HostelRequest hostelRequest) {
-        return ResponseEntity.ok(hostelService.updateHostel(hostelId, hostelRequest));
+    public ResponseEntity<?> updateHostel(@PathVariable Long hostelId, HostelRequest hostelRequest) {
+        return ResponseEntity.ok(Map.of("hostel",hostelService.updateHostel(hostelId, hostelRequest)));
     }
     @DeleteMapping("/hostel/{hostelId}")
     public ResponseEntity<?> deleteHostel(@PathVariable Long hostelId) {
         hostelService.deleteHostel(hostelId);
-        return ResponseEntity.ok("Hostel deleted successfully");
+        return ResponseEntity.ok(Map.of("message","Hostel deleted successfully"));
     }
 
 }

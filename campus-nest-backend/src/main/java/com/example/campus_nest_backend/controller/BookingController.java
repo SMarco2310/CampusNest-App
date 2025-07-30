@@ -22,8 +22,8 @@ public class BookingController {
     }
 
     @GetMapping("/bookings")
-    public ResponseEntity<List<Booking>> getBookings() {
-        return ResponseEntity.ok(bookingService.getAllBookings());
+    public ResponseEntity<?> getBookings() {
+        return ResponseEntity.ok(Map.of("bookings",bookingService.getAllBookings()));
     }
 
     @GetMapping("/bookings/{userId}")

@@ -76,7 +76,8 @@ public class UserService implements UserDetailsService {
         // Find the user by email
         User user = userRepository.findByEmail(email);
         // If user is not found, throw an exception
-        if (userRepository.existsByEmail(email)) {
+        System.out.println(user.toString());
+        if (!userRepository.existsByEmail(email)) {
             throw new UserNotFoundException("User not found with email: " + email);
         }
         // Return the user details
