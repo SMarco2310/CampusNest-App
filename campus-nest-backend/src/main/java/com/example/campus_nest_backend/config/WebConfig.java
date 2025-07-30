@@ -29,20 +29,20 @@ public class WebConfig implements WebMvcConfigurer {
 //        // registry.addViewController("/login").setViewName("login");
 //    }
 
-    // 4. Interceptors (optional: for logging, auth, etc.)
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        // registry.addInterceptor(new YourCustomInterceptor());
-    }
-
-    // 5. Message converters (for customizing Jackson, etc.)
-    // You usually don’t need to override this unless customizing JSON mapping.
-    // Spring Boot configures it well by default.
-
-
-    @Override
-    public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
-        configurer.setDefaultTimeout(5000); // 5 seconds
-    }
+//    // 4. Interceptors (optional: for logging, auth, etc.)
+//    @Override
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        // registry.addInterceptor(new YourCustomInterceptor());
+//    }
+//
+//    // 5. Message converters (for customizing Jackson, etc.)
+//    // You usually don’t need to override this unless customizing JSON mapping.
+//    // Spring Boot configures it well by default.
+//
+//
+//    @Override
+//    public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
+//        configurer.setDefaultTimeout(5000); // 5 seconds
+//    }
 
 }
