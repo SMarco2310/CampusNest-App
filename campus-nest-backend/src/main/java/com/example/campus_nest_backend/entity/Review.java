@@ -1,6 +1,7 @@
 package com.example.campus_nest_backend.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +10,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "reviews")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

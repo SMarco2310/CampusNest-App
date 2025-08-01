@@ -8,6 +8,7 @@ import com.example.campus_nest_backend.exception.HostelNotFoundException;
 import com.example.campus_nest_backend.exception.RoomNotFoundException;
 import com.example.campus_nest_backend.repository.HostelRepository;
 import com.example.campus_nest_backend.repository.RoomRepository;
+import com.example.campus_nest_backend.utils.Capacity;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,16 +28,16 @@ public class RoomService {
                 .orElseThrow(() -> new HostelNotFoundException("Hostel not found with ID: " + newRoomRequest.getHostelId()));
         hostel.setTotalRooms(hostel.getTotalRooms() + 1);
         Room room = new Room();
-        if (newRoomRequest.getCapacity() < 1) {
-            throw new IllegalArgumentException("Room capacity must be at least 1");
-        }
         hostel.setAvailableRooms(
                 (int) hostel.getRooms().stream()
                         .filter(Room::isAvailable)
                         .count()
         );
         room.setRoomNumber(newRoomRequest.getRoomNumber());
+        room.setRoomCapacity(Capacity.fromValue(newRoomRequest.getCapacity()));
         room.setCapacity(newRoomRequest.getCapacity());
+        room.setFloor(newRoomRequest.getFloor());
+
         room.setHostel(hostel);
         room.setPricePerBed(newRoomRequest.getPricePerBed());
         room.setDescription(newRoomRequest.getDescription());
@@ -64,7 +65,9 @@ public class RoomService {
         existingRoom.setHostel(hostel);
         // Update the room properties
         existingRoom.setRoomNumber(newRoomRequest.getRoomNumber());
+        existingRoom.setRoomCapacity(Capacity.fromValue(newRoomRequest.getCapacity()));
         existingRoom.setCapacity(newRoomRequest.getCapacity());
+        existingRoom.setFloor(newRoomRequest.getFloor());
         existingRoom.setHostel(hostel);
         existingRoom.setPricePerBed(newRoomRequest.getPricePerBed());
         existingRoom.setDescription(newRoomRequest.getDescription());

@@ -1,6 +1,7 @@
 package com.example.campus_nest_backend.entity;
 
 import com.example.campus_nest_backend.utils.Status;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +12,7 @@ import java.util.Date;
 @Getter
 @Entity
 @Table(name = "bookings")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Booking {
 
     @Id

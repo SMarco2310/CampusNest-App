@@ -1,5 +1,7 @@
 package com.example.campus_nest_backend.entity;
 
+import com.example.campus_nest_backend.utils.Capacity;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +13,9 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "rooms")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+
+
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,6 +23,12 @@ public class Room {
     private Long id; // Unique identifier for the room
     @Column(nullable = false, name = "room_number")
     private String roomNumber; // Room number or identifier
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, name = "room_capacity")
+    private Capacity roomCapacity; // Enum representing the capacity type (e.g., SINGLE, DOUBLE, etc.)
+    @Column(nullable = false, name = "floor")
+    private int floor; // Floor number where the room is located
     @Column(nullable = false, name = "capacity")
     private int capacity = 0; // Maximum number of occupants in the room
     @Column(nullable = false, name = "current_occupancy")

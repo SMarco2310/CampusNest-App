@@ -2,6 +2,7 @@ package com.example.campus_nest_backend.entity;
 
 
 import com.example.campus_nest_backend.utils.Role;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
@@ -16,6 +17,7 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "users")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
