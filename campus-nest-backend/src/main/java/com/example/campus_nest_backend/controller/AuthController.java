@@ -1,8 +1,8 @@
 package com.example.campus_nest_backend.controller;
 
 
-import com.example.campus_nest_backend.dto.LoginRequest;
-import com.example.campus_nest_backend.dto.SignUpRequest;
+import com.example.campus_nest_backend.dto.Requests.LoginRequest;
+import com.example.campus_nest_backend.dto.Requests.SignUpRequest;
 import com.example.campus_nest_backend.entity.User;
 import com.example.campus_nest_backend.security.JwtService;
 import com.example.campus_nest_backend.service.UserService;

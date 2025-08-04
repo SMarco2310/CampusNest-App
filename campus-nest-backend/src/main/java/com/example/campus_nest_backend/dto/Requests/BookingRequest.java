@@ -1,4 +1,4 @@
-package com.example.campus_nest_backend.dto;
+package com.example.campus_nest_backend.dto.Requests;
 
 
 import lombok.Getter;

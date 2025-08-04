@@ -62,7 +62,8 @@ public class SecurityConfig {
                                 "/api/review/review/{id}",         // GET review by ID
                                 "/api/review/review",              // POST add review
                                 "/api/review/review/{id}",        // PUT update review
-                                "/api/review/review/{id}"         // DELETE review
+                                "/api/review/review/{id}",        // DELETE review
+                                "/api/rooms/occupant/room/{roomId}"
                         ).hasAnyRole("STUDENT", "HOSTEL_MANAGER", "ADMIN")
                         .anyRequest().authenticated()
                 )

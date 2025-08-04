@@ -1,7 +1,9 @@
 package com.example.campus_nest_backend.service;
 
-import com.example.campus_nest_backend.dto.LoginRequest;
-import com.example.campus_nest_backend.dto.SignUpRequest;
+import com.example.campus_nest_backend.dto.Requests.LoginRequest;
+import com.example.campus_nest_backend.dto.Requests.SignUpRequest;
+import com.example.campus_nest_backend.dto.Requests.UpdateUserRequest;
+import com.example.campus_nest_backend.dto.Responses.UserResponse;
 import com.example.campus_nest_backend.entity.User;
 import com.example.campus_nest_backend.exception.UserNotFoundException;
 import com.example.campus_nest_backend.repository.UserRepository;
@@ -11,7 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import com.example.campus_nest_backend.utils.utils.*;
+
 import java.util.List;
 
 
@@ -24,9 +26,18 @@ public class UserService implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
-    public List<User> getAllUsers() {
+    public List<UserResponse> getAllUsers() {
         // This method retrieves all users from the database.
-        return userRepository.findAll();
+        return userRepository.findAll()
+                .stream()
+                .map(user -> new UserResponse(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail(),
+                        user.getPhone(),
+                        user.getRole(),
+                        user.getProfilePicture()))
+                .toList();
     }
 
     public User createUser(SignUpRequest signUpRequest) {
@@ -42,7 +53,7 @@ public class UserService implements UserDetailsService {
 
 //    Have to go through this  again to check the password encoding and other details
 
-    public User updateUser(Long id, User userDetails) {
+    public UserResponse updateUser(Long id, UpdateUserRequest userDetails) {
         // This method updates an existing user in the database
         User user = userRepository.findById(id).orElse(null);
         if (user == null) {
@@ -52,9 +63,18 @@ public class UserService implements UserDetailsService {
         user.setEmail(userDetails.getEmail());
         user.setPassword(userDetails.getPassword());
         user.setPhone(userDetails.getPhone());
-        user.setRole(userDetails.getRole());
         user.setProfilePicture(userDetails.getProfilePicture());
-        return userRepository.save(user);
+        userRepository.save(user);
+        return new UserResponse(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getPhone(),
+                user.getRole(),
+                user.getProfilePicture()
+
+
+        );
 
     }
 
@@ -62,8 +82,16 @@ public class UserService implements UserDetailsService {
         userRepository.deleteById(id);
     }
 
-    public User getUserById(Long id) {
-        return userRepository.findById(id).orElse(null);
+    public UserResponse getUserById(Long id) {
+        return userRepository.findById(id).map(user -> new UserResponse(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getPhone(),
+                user.getRole(),
+                user.getProfilePicture()
+                ))
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + id));
     }
 
         /*

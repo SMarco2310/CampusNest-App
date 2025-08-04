@@ -1,10 +1,8 @@
 package com.example.campus_nest_backend.controller;
 
-import com.example.campus_nest_backend.dto.NewRoomRequest;
-import com.example.campus_nest_backend.entity.Room;
+import com.example.campus_nest_backend.dto.Requests.NewRoomRequest;
 import com.example.campus_nest_backend.service.RoomService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,4 +45,8 @@ public class RoomController {
         return ResponseEntity.ok(Map.of("message","Room deleted successfully")); // Return 204 No Content after deletion
     }
 
+    @GetMapping("/occupant/room/{roomId}")
+    public ResponseEntity<?> getOccupantRooms(@PathVariable Long roomId) {
+        return ResponseEntity.ok(Map.of("occupants",roomService.getUsersInRoom(roomId)));
+    }
 }

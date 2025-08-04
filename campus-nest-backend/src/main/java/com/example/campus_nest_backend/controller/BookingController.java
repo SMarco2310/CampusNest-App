@@ -1,18 +1,18 @@
 package com.example.campus_nest_backend.controller;
 
 
-import com.example.campus_nest_backend.dto.BookingRequest;
+import com.example.campus_nest_backend.dto.Requests.BookingRequest;
 import com.example.campus_nest_backend.entity.Booking;
 import com.example.campus_nest_backend.service.BookingService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
-@Controller("/api/bookings")
+@RestController
+@RequestMapping("/api/bookings")
 public class BookingController {
 
     private final BookingService bookingService;
@@ -22,6 +22,7 @@ public class BookingController {
     }
 
     @GetMapping("/bookings")
+    @ResponseBody
     public ResponseEntity<?> getBookings() {
         return ResponseEntity.ok(Map.of("bookings",bookingService.getAllBookings()));
     }

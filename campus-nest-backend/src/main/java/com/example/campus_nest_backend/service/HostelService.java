@@ -1,6 +1,7 @@
 package com.example.campus_nest_backend.service;
 
-import com.example.campus_nest_backend.dto.HostelRequest;
+import com.example.campus_nest_backend.dto.Requests.HostelRequest;
+import com.example.campus_nest_backend.dto.Responses.HostelResponse;
 import com.example.campus_nest_backend.entity.Hostel;
 import com.example.campus_nest_backend.entity.User;
 import com.example.campus_nest_backend.exception.HostelNotFoundException;
@@ -23,7 +24,7 @@ public class HostelService {
 
     @Transactional
     // This method retrieves all hostels from the database.
-    public Hostel createHostel(HostelRequest hostelRequest) {
+    public HostelResponse createHostel(HostelRequest hostelRequest) {
         // Convert HostelRequest to Hostel entity
         User manager = userRepository.findById(hostelRequest.getManagerId())
                 .map(user -> {
@@ -38,16 +39,34 @@ public class HostelService {
         hostel.setAddress(hostelRequest.getAddress());
         hostel.setDescription(hostelRequest.getDescription());
         hostel.setManager(manager);
-        return hostelRepository.save(hostel);
+        hostelRepository.save(hostel);
+        return new HostelResponse(
+                hostel.getId(),
+                hostel.getName(),
+                hostel.getAddress(),
+                hostel.getDescription(),
+                hostel.getAvailableRooms(),
+                hostel.getTotalRooms(),
+                manager.getId(),
+                hostel.getImageUrls());
     }
     // This method retrieves all hostels from the database.
-    public List<Hostel> getAllHostels() {
-        return hostelRepository.findAll();
+    public List<HostelResponse> getAllHostels() {
+        return hostelRepository.findAll().stream().map( hostel -> new HostelResponse(
+                hostel.getId(),
+                hostel.getName(),
+                hostel.getAddress(),
+                hostel.getDescription(),
+                hostel.getAvailableRooms(),
+                hostel.getTotalRooms(),
+                hostel.getManager().getId(),
+                hostel.getImageUrls()))
+                .toList();
     }
 
     @Transactional
     // This method retrieves all hostels from the database.
-    public Hostel updateHostel(Long id,HostelRequest hostelRequest) {
+    public HostelResponse updateHostel(Long id,HostelRequest hostelRequest) {
         // Update an existing hostel
         Hostel hostel = hostelRepository.findById(id)
                 .orElseThrow(() -> new HostelNotFoundException("Hostel not found with ID: " + id));
@@ -66,13 +85,30 @@ public class HostelService {
         hostel.setDescription(hostelRequest.getDescription());
         hostel.setManager(manager);
 
-        return hostelRepository.save(hostel);
+        hostelRepository.save(hostel);
+        return new HostelResponse(
+                hostel.getId(),
+                hostel.getName(),
+                hostel.getAddress(),
+                hostel.getDescription(),
+                hostel.getAvailableRooms(),
+                hostel.getTotalRooms(),
+                manager.getId(),
+                hostel.getImageUrls());
     }
 
     // This method retrieves a hostel by its ID.
-    public Hostel getHostelById(Long id) {
+    public HostelResponse getHostelById(Long id) {
         // Retrieve a hostel by its ID
-        return hostelRepository.findById(id)
+        return hostelRepository.findById(id).map( hostel -> new HostelResponse(
+                hostel.getId(),
+                hostel.getName(),
+                hostel.getAddress(),
+                hostel.getDescription(),
+                hostel.getAvailableRooms(),
+                hostel.getTotalRooms(),
+                hostel.getManager().getId(),
+                hostel.getImageUrls()))
                 .orElseThrow(() -> new HostelNotFoundException("Hostel not found with ID: " + id));
     }
     @Transactional

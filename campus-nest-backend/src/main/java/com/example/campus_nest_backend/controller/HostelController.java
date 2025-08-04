@@ -1,12 +1,8 @@
 package com.example.campus_nest_backend.controller;
 
-import com.example.campus_nest_backend.dto.HostelRequest;
-import com.example.campus_nest_backend.entity.Hostel;
-import com.example.campus_nest_backend.repository.HostelRepository;
+import com.example.campus_nest_backend.dto.Requests.HostelRequest;
 import com.example.campus_nest_backend.service.HostelService;
-import com.example.campus_nest_backend.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;

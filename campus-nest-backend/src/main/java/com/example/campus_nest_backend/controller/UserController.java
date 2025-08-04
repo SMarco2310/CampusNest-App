@@ -1,6 +1,7 @@
 package com.example.campus_nest_backend.controller;
 
 
+import com.example.campus_nest_backend.dto.Requests.UpdateUserRequest;
 import com.example.campus_nest_backend.entity.User;
 import com.example.campus_nest_backend.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -31,8 +32,8 @@ public class UserController {
 
     // This method retrieves a user by their ID.
     @GetMapping("/{userId}")
-    public ResponseEntity<?> getUserById( @PathVariable String userId) {
-        return ResponseEntity.ok(Map.of("user",userService.getUserById(Long.valueOf(userId))));
+    public ResponseEntity<?> getUserById( @PathVariable Long userId) {
+        return ResponseEntity.ok(Map.of("user",userService.getUserById(userId)));
     }
     // This method deletes a user by their ID.
     @DeleteMapping("/delete/{userId}")
@@ -42,7 +43,7 @@ public class UserController {
     }
 
     @PutMapping("/update/{userId}")
-    public ResponseEntity<?> updateUser(@PathVariable Long userId, User userDetails) {
+    public ResponseEntity<?> updateUser(@PathVariable Long userId, UpdateUserRequest userDetails) {
         return ResponseEntity.ok(Map.of("user",userService.updateUser(userId, userDetails)));
     }
 }

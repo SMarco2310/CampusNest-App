@@ -8,4 +8,13 @@ public enum Status {
     Status(String statusName) {
         this.statusName = statusName;
     }
+
+    public static Status fromValue(String value) {
+        for (Status capacity : values()) {
+            if (capacity.statusName.equals(value)) {
+                return capacity;
+            }
+        }
+        throw new IllegalArgumentException("Invalid status value: " + value);
+    }
 }

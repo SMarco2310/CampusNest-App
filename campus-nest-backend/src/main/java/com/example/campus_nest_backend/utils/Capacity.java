@@ -1,5 +1,9 @@
 package com.example.campus_nest_backend.utils;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
 public enum Capacity {
     SINGLE(1),
     DOUBLE(2),
@@ -10,10 +14,6 @@ public enum Capacity {
 
     Capacity(int value) {
         this.value = value;
-    }
-
-    public int getValue() {
-        return value;
     }
 
     public static Capacity fromValue(int value) {

@@ -1,6 +1,6 @@
 package com.example.campus_nest_backend.controller;
 
-import com.example.campus_nest_backend.dto.ReviewRequest;
+import com.example.campus_nest_backend.dto.Requests.ReviewRequest;
 import com.example.campus_nest_backend.service.ReviewService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

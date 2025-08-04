@@ -1,6 +1,5 @@
-package com.example.campus_nest_backend.dto;
+package com.example.campus_nest_backend.dto.Requests;
 
-import com.example.campus_nest_backend.utils.Capacity;
 import lombok.Getter;
 import lombok.Setter;
 
