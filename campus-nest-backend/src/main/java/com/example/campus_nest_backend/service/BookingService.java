@@ -8,6 +8,7 @@ import com.example.campus_nest_backend.entity.Room;
 import com.example.campus_nest_backend.entity.User;
 import com.example.campus_nest_backend.exception.BookingNotFoundException;
 import com.example.campus_nest_backend.exception.RoomUnavailableException;
+import com.example.campus_nest_backend.exception.UserHasARoomAlreadyException;
 import com.example.campus_nest_backend.repository.BookingRepository;
 import com.example.campus_nest_backend.repository.RoomRepository;
 import com.example.campus_nest_backend.repository.UserRepository;
@@ -22,15 +23,13 @@ import java.util.List;
 public class BookingService {
 
     private final BookingRepository bookingRepository;
-    private final UserService userService;
     private final RoomService roomService;
     private final EmailService emailService;
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
 
-    public BookingService(BookingRepository bookingRepository, UserService userService, RoomService roomService, EmailService emailService, UserRepository userRepository, RoomRepository roomRepository) {
+    public BookingService(BookingRepository bookingRepository, RoomService roomService, EmailService emailService, UserRepository userRepository, RoomRepository roomRepository) {
         this.bookingRepository = bookingRepository;
-        this.userService = userService;
         this.roomService = roomService;
         this.emailService = emailService;
         this.userRepository = userRepository;
@@ -43,6 +42,9 @@ public class BookingService {
         Room room = roomRepository.findRoomById(bookingRequest.getRoomId());
         User user = userRepository.findUserById(bookingRequest.getUserId());
         Hostel hostel = room.getHostel();
+        if (bookingRepository.existsByUserId((user.getId()))){
+            throw new UserHasARoomAlreadyException("User already has a booking.");
+        }
 
         if (!room.isAvailable() || room.getCurrentOccupancy() >= room.getCapacity()) {
             throw new RoomUnavailableException("Room is not available or is at full capacity");
@@ -64,6 +66,7 @@ public class BookingService {
                 "Thank You for booking with Us",
                 "Thank you for Booking with Us " + hostel.getName()
         );
+
         user.setRoom(room);
         roomService.save(room);
 

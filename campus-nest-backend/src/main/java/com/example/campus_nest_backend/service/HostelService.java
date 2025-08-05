@@ -68,8 +68,7 @@ public class HostelService {
     // This method retrieves all hostels from the database.
     public HostelResponse updateHostel(Long id,HostelRequest hostelRequest) {
         // Update an existing hostel
-        Hostel hostel = hostelRepository.findById(id)
-                .orElseThrow(() -> new HostelNotFoundException("Hostel not found with ID: " + id));
+        Hostel hostel = hostelRepository.getHostelById(id);
 
         User manager = userRepository.findById(hostelRequest.getManagerId())
                 .map(user -> {
