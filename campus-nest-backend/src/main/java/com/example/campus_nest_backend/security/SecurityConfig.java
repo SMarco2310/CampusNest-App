@@ -24,7 +24,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
+                .cors() // enable CORS
+                .and()
+                .csrf().disable()
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/auth/**",
@@ -53,7 +55,7 @@ public class SecurityConfig {
 
                         // User-specific endpoints
                         .requestMatchers(
-                                "/api/users/{userId}",             // GET user by ID
+                                "/api/users/{userId}",            // GET user by ID
                                 "/api/bookings/bookings/{userId}", // GET user bookings
                                 "/api/bookings/booking",           // POST create booking
                                 "/api/bookings/update/booking/{id}", // PUT update booking
