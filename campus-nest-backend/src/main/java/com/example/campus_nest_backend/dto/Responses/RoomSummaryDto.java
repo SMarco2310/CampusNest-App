@@ -1,22 +1,22 @@
 package com.example.campus_nest_backend.dto.Responses;
 
-
 import com.example.campus_nest_backend.utils.Capacity;
-import lombok.AllArgsConstructor;
+import java.math.BigDecimal;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+
+
+@Data
 @Setter
 @Getter
-@AllArgsConstructor
-public class RoomResponse {
+
+public class RoomSummaryDto {
     private Long id;
     private String roomNumber;
     private Capacity roomCapacity;
-    private int currentOccupancy = 0;
-    private double pricePerBed;
-    private String description;
-    private Long hostelId;
-    private boolean isAvailable;
-
+    private BigDecimal pricePerBed;
+    private boolean hasAvailableSpace;
+    private int availableSpaces;
 }

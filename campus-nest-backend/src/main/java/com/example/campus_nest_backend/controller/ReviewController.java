@@ -1,54 +1,74 @@
 package com.example.campus_nest_backend.controller;
 
-import com.example.campus_nest_backend.dto.Requests.ReviewRequest;
+import com.example.campus_nest_backend.dto.Requests.ReviewCreateRequestDto;
+import com.example.campus_nest_backend.dto.Requests.ReviewUpdateRequestDto;
+import com.example.campus_nest_backend.dto.Responses.ApiResponse;
+import com.example.campus_nest_backend.dto.Responses.ReviewResponseDto;
 import com.example.campus_nest_backend.service.ReviewService;
-import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
-
 @RestController
-@RequestMapping("/api/review")
+@RequestMapping("/api/reviews")
+@RequiredArgsConstructor
 public class ReviewController {
 
     private final ReviewService reviewService;
 
-
-    public ReviewController(ReviewService reviewService) {
-        this.reviewService = reviewService;
+    @PostMapping
+    public ResponseEntity<ApiResponse<ReviewResponseDto>> createReview(@RequestBody ReviewCreateRequestDto request) {
+        ReviewResponseDto createdReview = reviewService.createReview(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ApiResponse<>(
+                        HttpStatus.CREATED.value(),
+                        true,
+                        "Review created successfully",
+                        createdReview
+                ));
     }
 
-
-    @GetMapping("/{hostelId}/reviews")
-    public ResponseEntity<?> getReviewByHostelId(@Valid @PathVariable Long hostelId){
-        return ResponseEntity.ok(Map.of("reviews",reviewService.getReviewsByHostelId(hostelId)));
-    }
-
-    @GetMapping("/review/{id}")
-    public ResponseEntity<?> getReviewById(@Valid @PathVariable Long id){
-        return ResponseEntity.ok(Map.of("review",reviewService.getReviewById(id)));
-    }
-
-    @PostMapping("/review")
-    public ResponseEntity<?> addReview(@Valid @RequestBody ReviewRequest reviewRequest){
-        return ResponseEntity.ok(Map.of("review",reviewService.addReview(reviewRequest)));
-    }
-
-    @PutMapping("/review/{id}")
-    public ResponseEntity<?> updateReview(@Valid @PathVariable Long id, @Valid @RequestBody ReviewRequest reviewRequest){
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<ReviewResponseDto>> getReviewById(@PathVariable Long id) {
+        ReviewResponseDto review = reviewService.getReviewById(id);
         return ResponseEntity.ok(
-                Map.of("review", reviewService.updateReview(id, reviewRequest),
-                        "message","Review updated successfully"
-        ));
+                new ApiResponse<>(
+                        HttpStatus.OK.value(),
+                        true,
+                        "Review fetched successfully",
+                        review
+                )
+        );
     }
 
-    @DeleteMapping("/review/{id}")
-    public ResponseEntity<?> deleteReview(@Valid @PathVariable Long id){
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<ReviewResponseDto>> updateReview(
+            @PathVariable Long id,
+            @RequestBody ReviewUpdateRequestDto request
+    ) {
+        ReviewResponseDto updatedReview = reviewService.updateReview(id, request);
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        HttpStatus.OK.value(),
+                        true,
+                        "Review updated successfully",
+                        updatedReview
+                )
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteReview(@PathVariable Long id) {
         reviewService.deleteReview(id);
-        return ResponseEntity.ok(Map.of("message","Review deleted successfully"));
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        HttpStatus.OK.value(),
+                        true,
+                        "Review deleted successfully",
+                        null
+                )
+        );
     }
-
-
 }

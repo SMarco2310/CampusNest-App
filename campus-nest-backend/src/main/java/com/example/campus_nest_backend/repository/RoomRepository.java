@@ -8,4 +8,8 @@ import org.springframework.stereotype.Repository;
 
 public interface RoomRepository extends JpaRepository<Room, Long> {
     Room findRoomById(Long roomId);
+
+    boolean existsByRoomNumberAndHostelIdAndIdNot(String roomNumber, Long hostelId, Long roomId);
+
+    boolean existsByRoomNumberAndHostelId(String roomNumber, Long hostelId);
 }

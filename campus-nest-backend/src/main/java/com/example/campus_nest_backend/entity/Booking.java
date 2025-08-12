@@ -1,40 +1,113 @@
+// Booking Entity
 package com.example.campus_nest_backend.entity;
 
 import com.example.campus_nest_backend.utils.Status;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
 
-import java.util.Date;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 
-@Setter
 @Getter
+@Setter
 @Entity
 @Table(name = "bookings")
 public class Booking {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, unique = true, name = "id")
+    @Column(name = "id")
     private Long id;
 
-    // Many bookings can be made by one user
-    @ManyToOne(fetch = FetchType.EAGER)
+    @NotNull(message = "User is required")
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @NotNull(message = "Room is required")
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", nullable = false)
-    private Room room; // The room being booked
+    private Room room;
 
+    @CreatedDate
+    @Column(nullable = false, name = "booking_date", updatable = false)
+    private LocalDateTime bookingDate;
+
+    @NotNull(message = "Check-in date is required")
+    @Future(message = "Check-in date must be in the future")
+    @Column(nullable = false, name = "check_in_date")
+    private LocalDate checkInDate;
+
+    @NotNull(message = "Check-out date is required")
+    @Column(nullable = false, name = "check_out_date")
+    private LocalDate checkOutDate;
+
+    @NotNull(message = "Status is required")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "status")
     private Status status = Status.PENDING;
 
-    @Column(nullable = false, name = "booking_date")
-    private Date bookingDate; // Date when the booking was made
+    @DecimalMin(value = "0.0", message = "Total amount cannot be negative")
+    @Column(nullable = false, name = "total_amount", precision = 10, scale = 2)
+    private BigDecimal totalAmount = BigDecimal.ZERO;
+
+    @Column(name = "cancellation_date")
+    private LocalDateTime cancellationDate;
+
+    @Column(name = "cancellation_reason", length = 500)
+    private String cancellationReason;
 
     public Booking() {
+        this.bookingDate = LocalDateTime.now();
+    }
+
+    public Booking(User user, Room room, LocalDate checkInDate, Status status) {
+        this();
+        this.user = user;
+        this.room = room;
+        this.checkInDate = checkInDate;
+        this.status = status;
+    }
+
+    @AssertTrue(message = "Check-out date must be after check-in date")
+    private boolean isCheckOutAfterCheckIn() {
+        return checkOutDate == null || checkInDate == null || checkOutDate.isAfter(checkInDate);
+    }
+
+    public static List<Booking> getBookings(Hostel hostel) {
+        return hostel.getRooms().stream()
+                .flatMap(room -> room.getOccupants().stream())
+                .flatMap(user -> user.getBookings().stream())
+                .filter(booking -> booking.getRoom().getHostel().equals(hostel))
+                .toList();
+    }
+
+    public boolean canBeCancelled() {
+        return (status == Status.PENDING || status == Status.CONFIRMED) &&
+                checkInDate.isAfter(LocalDate.now());
+    }
+
+    public boolean isActive() {
+        LocalDate now = LocalDate.now();
+        return status == Status.CONFIRMED &&
+                !now.isBefore(checkInDate) &&
+                !now.isAfter(checkOutDate);
+    }
+
+    public long getDurationInDays() {
+        return ChronoUnit.DAYS.between(checkInDate, checkOutDate);
+    }
+
+    public void cancel() {
+        if (canBeCancelled()) {
+            this.status = Status.CANCELLED;
+            this.cancellationDate = LocalDateTime.now();
+        }
     }
 }
+

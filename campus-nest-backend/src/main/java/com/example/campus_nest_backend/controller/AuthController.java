@@ -1,18 +1,15 @@
 package com.example.campus_nest_backend.controller;
 
-
-import com.example.campus_nest_backend.dto.Requests.LoginRequest;
-import com.example.campus_nest_backend.dto.Requests.SignUpRequest;
+import com.example.campus_nest_backend.dto.Requests.UserLoginRequestDto;
+import com.example.campus_nest_backend.dto.Requests.UserRegistrationRequestDto;
+import com.example.campus_nest_backend.dto.Responses.ApiResponse;
+import com.example.campus_nest_backend.dto.Responses.LoginResponseDto;
 import com.example.campus_nest_backend.entity.User;
 import com.example.campus_nest_backend.security.JwtService;
 import com.example.campus_nest_backend.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -22,40 +19,44 @@ public class AuthController {
     private final JwtService jwtService;
 
     public AuthController(UserService userService, JwtService jwtService) {
-        // Constructor injection for UserService
-        // This allows the AuthController to use UserService methods for authentication.
         this.userService = userService;
         this.jwtService = jwtService;
     }
 
-    // This method handles user login requests.
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        // Authenticate the user using the UserService.
-        User user = userService.authenticateUser(loginRequest);
-        if (user == null) {
-            // If authentication fails, return an error response.
-            return ResponseEntity.status(401).body(Map.of("message", "Invalid credentials"));}
-        return ResponseEntity.ok(Map.of(
-                "message", "User logged in successfully",
-                 "token", jwtService.generateToken(user.getEmail(), user.getRole().name()),
-                 "user", user.getId()));
+    public ResponseEntity<ApiResponse<?>> login(@RequestBody UserLoginRequestDto loginRequest) {
+        try {
+            User user = userService.authenticateUser(loginRequest);
+            String token = jwtService.generateToken(user.getEmail(), user.getRole().name());
+
+            return ResponseEntity.ok(new ApiResponse<>(
+                    HttpStatus.OK.value(),
+                    true,
+                    "User logged in successfully",
+                    new LoginResponseDto(token, user.getId())
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>(
+                    HttpStatus.UNAUTHORIZED.value(),
+                    false,
+                    "Invalid email or password",
+                    null
+            ));
+        }
     }
 
     @PostMapping("/register")
-    // This method handles user registration requests.
-    public ResponseEntity<?> register(@RequestBody SignUpRequest signUpRequest) {
-        User user =userService.createUser(signUpRequest);
-        String token =jwtService.generateToken(signUpRequest.getEmail(), signUpRequest.getRole());
-        // After creating a user, generate a JWT token for the user.
-        return ResponseEntity.ok(
-                Map.of(
-                        "message", "User registered successfully",
-                        "token", token,
-                        "user", user.getId()
-                )
-        );
+    public ResponseEntity<ApiResponse<?>> register(@RequestBody UserRegistrationRequestDto registrationRequest) {
+        User user = userService.createUser(registrationRequest);
+        String token = jwtService.generateToken(user.getEmail(), user.getRole().name());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(
+                HttpStatus.CREATED.value(),
+                true,
+                "User registered successfully",
+                new LoginResponseDto(token, user.getId())
+        ));
     }
+
+
 }
-
-

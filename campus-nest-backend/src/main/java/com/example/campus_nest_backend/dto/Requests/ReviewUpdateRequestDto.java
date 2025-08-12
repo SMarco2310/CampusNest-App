@@ -6,10 +6,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-
-public class ReviewRequest {
+public class ReviewUpdateRequestDto {
     private String comment;
     private int rating;
-    private Long user;
-    private Long hostel;
 }

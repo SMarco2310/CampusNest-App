@@ -1,20 +1,19 @@
 package com.example.campus_nest_backend.dto.Requests;
 
+
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+@Data
+@AllArgsConstructor
 @Setter
 @Getter
-@AllArgsConstructor
-public class UpdateUserRequest {
+public class UserUpdateRequestDto {
     private String name;
-    @Email
-    private String email;
-
     private String phone;
-    private String password;
     private String profilePicture;
 }

@@ -1,49 +1,66 @@
 package com.example.campus_nest_backend.controller;
 
-
-import com.example.campus_nest_backend.dto.Requests.UpdateUserRequest;
-import com.example.campus_nest_backend.entity.User;
+import com.example.campus_nest_backend.dto.Requests.PasswordUpdateRequestDto;
+import com.example.campus_nest_backend.dto.Requests.UserUpdateRequestDto;
+import com.example.campus_nest_backend.dto.Responses.ApiResponse;
+import com.example.campus_nest_backend.dto.Responses.UserResponseDto;
 import com.example.campus_nest_backend.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
 public class UserController {
 
-    private final  UserService userService;
+    private final UserService userService;
 
-    public UserController(UserService userService) {
-
-        this.userService = userService;
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<UserResponseDto>>> getAllUsers() {
+        List<UserResponseDto> users = userService.getAllUsers();
+        return ResponseEntity.ok(
+                new ApiResponse<>(HttpStatus.OK.value(), true, "Users fetched successfully", users)
+        );
     }
 
-    // This method retrieves all users from the database.
-
-    @GetMapping("/users")
-    public ResponseEntity<?> getAllUsers() {
-
-        return ResponseEntity.ok(Map.of("users",userService.getAllUsers())); // Return 200 OK with the list of users
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<UserResponseDto>> getUserById(@PathVariable Long id) {
+        UserResponseDto user = userService.getUserById(id);
+        return ResponseEntity.ok(
+                new ApiResponse<>(HttpStatus.OK.value(), true, "User fetched successfully", user)
+        );
     }
 
-    // This method retrieves a user by their ID.
-    @GetMapping("/{userId}")
-    public ResponseEntity<?> getUserById( @PathVariable Long userId) {
-        return ResponseEntity.ok(Map.of("user",userService.getUserById(userId)));
-    }
-    // This method deletes a user by their ID.
-    @DeleteMapping("/delete/{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
-        userService.deleteUser(userId);
-        return ResponseEntity.ok(Map.of("message","User deleted successfully")); // Return 204 No Content after deletion
+    @PutMapping("/{id}/password")
+    public ResponseEntity<ApiResponse<Void>> updatePassword(
+            @PathVariable Long id,
+            @RequestBody PasswordUpdateRequestDto passwordUpdateRequest
+    ){
+        userService.updatePassword(id, passwordUpdateRequest);
+        return ResponseEntity.ok(
+                new ApiResponse<>(HttpStatus.OK.value(), true, "Password updated successfully", null)
+        );
     }
 
-    @PutMapping("/update/{userId}")
-    public ResponseEntity<?> updateUser(@PathVariable Long userId, UpdateUserRequest userDetails) {
-        return ResponseEntity.ok(Map.of("user",userService.updateUser(userId, userDetails)));
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<UserResponseDto>> updateUser(
+            @PathVariable Long id,
+            @RequestBody UserUpdateRequestDto updatedUser
+    ) {
+        UserResponseDto user = userService.updateUser(id, updatedUser);
+        return ResponseEntity.ok(
+                new ApiResponse<>(HttpStatus.OK.value(), true, "User updated successfully", user)
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(new ApiResponse<>(HttpStatus.NO_CONTENT.value(), true, "User deleted successfully", null));
     }
 }

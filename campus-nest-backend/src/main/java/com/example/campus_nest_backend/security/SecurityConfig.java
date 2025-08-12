@@ -31,8 +31,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/api/hostels/hostels",          // GET all hostels
-                                "/api/hostels/details/{hostelId}", // GET hostel details
-                                "/api/rooms/rooms/{hostelId}",           // GET rooms by hostel
+                                "/api/hostels/details/{id}", // GET hostel details
+                                "/api/rooms/rooms/{id}",           // GET rooms by hostel
                                 "/api/rooms/details/{roomId}"      // GET room details
                         ).permitAll()
 //
@@ -46,8 +46,8 @@ public class SecurityConfig {
                         // Hostel manager endpoints
                         .requestMatchers(
                                 "/api/hostels/create",             // POST create hostel
-                                "/api/hostels/hostel/{hostelId}",  // PUT update hostel
-                                "/api/hostels/delete/{hostelId}",  // DELETE hostel
+                                "/api/hostels/hostel/{id}",  // PUT update hostel
+                                "/api/hostels/delete/{id}",  // DELETE hostel
                                 "/api/rooms/add",                  // POST add room
                                 "/api/rooms/update/room/{roomId}", // PUT update room
                                 "/api/rooms/delete/room/{roomId}"  // DELETE room

@@ -1,122 +1,322 @@
 package com.example.campus_nest_backend.service;
 
-import com.example.campus_nest_backend.dto.Requests.HostelRequest;
-import com.example.campus_nest_backend.dto.Responses.HostelResponse;
-import com.example.campus_nest_backend.entity.Hostel;
-import com.example.campus_nest_backend.entity.User;
+import com.example.campus_nest_backend.dto.Requests.HostelCreateRequestDto;
+import com.example.campus_nest_backend.dto.Requests.HostelUpdateRequestDto;
+import com.example.campus_nest_backend.dto.Responses.*;
+import com.example.campus_nest_backend.entity.*;
+import com.example.campus_nest_backend.exception.DuplicateHostelNameException;
 import com.example.campus_nest_backend.exception.HostelNotFoundException;
 import com.example.campus_nest_backend.exception.ManagerNotFoundException;
 import com.example.campus_nest_backend.repository.HostelRepository;
 import com.example.campus_nest_backend.repository.UserRepository;
-import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
 import com.example.campus_nest_backend.utils.Role;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
 public class HostelService {
 
     private final HostelRepository hostelRepository;
-    private final  UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Transactional
-    // This method retrieves all hostels from the database.
-    public HostelResponse createHostel(HostelRequest hostelRequest) {
-        // Convert HostelRequest to Hostel entity
-        User manager = userRepository.findById(hostelRequest.getManagerId())
-                .map(user -> {
-                    if (user.getRole() != Role.HOSTEL_MANAGER) {
-                        throw new ManagerNotFoundException("User is not a manager.");
-                    }
-                    return user;
-                })
-                .orElseThrow(() -> new ManagerNotFoundException("Manager not found."));
-        Hostel hostel = new Hostel();
-        hostel.setName(hostelRequest.getName());
-        hostel.setAddress(hostelRequest.getAddress());
-        hostel.setDescription(hostelRequest.getDescription());
-        hostel.setManager(manager);
-        hostelRepository.save(hostel);
-        return new HostelResponse(
-                hostel.getId(),
-                hostel.getName(),
-                hostel.getAddress(),
-                hostel.getDescription(),
-                hostel.getAvailableRooms(),
-                hostel.getTotalRooms(),
-                manager.getId(),
-                hostel.getImageUrls());
-    }
-    // This method retrieves all hostels from the database.
-    public List<HostelResponse> getAllHostels() {
-        return hostelRepository.findAll().stream().map( hostel -> new HostelResponse(
-                hostel.getId(),
-                hostel.getName(),
-                hostel.getAddress(),
-                hostel.getDescription(),
-                hostel.getAvailableRooms(),
-                hostel.getTotalRooms(),
-                hostel.getManager().getId(),
-                hostel.getImageUrls()))
-                .toList();
+    public HostelService(HostelRepository hostelRepository, UserRepository userRepository) {
+        this.hostelRepository = hostelRepository;
+        this.userRepository = userRepository;
     }
 
     @Transactional
-    // This method retrieves all hostels from the database.
-    public HostelResponse updateHostel(Long id,HostelRequest hostelRequest) {
-        // Update an existing hostel
-        Hostel hostel = hostelRepository.getHostelById(id);
+    public HostelResponseDto createHostel(HostelCreateRequestDto request) {
+        validateHostelCreateRequest(request);
 
-        User manager = userRepository.findById(hostelRequest.getManagerId())
-                .map(user -> {
-                    if (user.getRole() != Role.HOSTEL_MANAGER) {
-                        throw new ManagerNotFoundException("User is not a manager.");
-                    }
-                    return user;
-                })
-                .orElseThrow(() -> new ManagerNotFoundException("Manager not found."));
-
-        hostel.setName(hostelRequest.getName());
-        hostel.setAddress(hostelRequest.getAddress());
-        hostel.setDescription(hostelRequest.getDescription());
-        hostel.setManager(manager);
-
-        hostelRepository.save(hostel);
-        return new HostelResponse(
-                hostel.getId(),
-                hostel.getName(),
-                hostel.getAddress(),
-                hostel.getDescription(),
-                hostel.getAvailableRooms(),
-                hostel.getTotalRooms(),
-                manager.getId(),
-                hostel.getImageUrls());
-    }
-
-    // This method retrieves a hostel by its ID.
-    public HostelResponse getHostelById(Long id) {
-        // Retrieve a hostel by its ID
-        return hostelRepository.findById(id).map( hostel -> new HostelResponse(
-                hostel.getId(),
-                hostel.getName(),
-                hostel.getAddress(),
-                hostel.getDescription(),
-                hostel.getAvailableRooms(),
-                hostel.getTotalRooms(),
-                hostel.getManager().getId(),
-                hostel.getImageUrls()))
-                .orElseThrow(() -> new HostelNotFoundException("Hostel not found with ID: " + id));
-    }
-    @Transactional
-    // This method deletes a hostel by its ID.
-    public void deleteHostel(Long id) {
-        // Delete a hostel by its ID
-        if (!hostelRepository.existsById(id)) {
-            throw new HostelNotFoundException("Hostel not found with ID: " + id);
+        if (hostelRepository.existsByHostelNameIgnoreCase(request.getHostelName())) {
+            throw new DuplicateHostelNameException("Hostel with name '" + request.getHostelName() + "' already exists");
         }
+
+        User manager = findAndValidateManager(request.getManagerId());
+
+        if (hostelRepository.existsByManagerId(manager.getId())) {
+            throw new ManagerNotFoundException("Manager is already assigned to another hostel");
+        }
+
+        Hostel hostel = new Hostel();
+        hostel.setHostelName(request.getHostelName());
+        hostel.setLocation(request.getLocation());
+        hostel.setDescription(request.getDescription());
+        hostel.setHostelPictures(request.getHostelPictures());
+        hostel.setManager(manager);
+        hostel.setCheckInTime(request.getCheckInTime());
+        hostel.setCheckOutTime(request.getCheckOutTime());
+
+        List<BankAccountDetails> bankAccounts = request.getBankAccountDetails().stream()
+                .map(dto -> {
+                    BankAccountDetails details = new BankAccountDetails();
+                    details.setAccountName(dto.getAccountName());
+                    details.setBankName(dto.getBankName());
+                    details.setCurrency(dto.getCurrency());
+                    details.setAccountNumber(dto.getAccountNumber());
+                    return details;
+                })
+                .collect(Collectors.toList());
+
+        hostel.setBankAccountDetails(bankAccounts);
+
+        Hostel savedHostel = hostelRepository.save(hostel);
+        return mapToHostelResponseDto(savedHostel);
+    }
+
+    @Transactional
+    public HostelResponseDto updateHostel(Long id, HostelUpdateRequestDto request) {
+        if (id == null) {
+            throw new IllegalArgumentException("Hostel ID cannot be null");
+        }
+        validateHostelUpdateRequest(request);
+
+        Hostel existingHostel = hostelRepository.findById(id)
+                .orElseThrow(() -> new HostelNotFoundException("Hostel not found with ID: " + id));
+
+        if (StringUtils.hasText(request.getHostelName()) &&
+                !existingHostel.getHostelName().equalsIgnoreCase(request.getHostelName()) &&
+                hostelRepository.existsByHostelNameIgnoreCaseAndIdNot(request.getHostelName(), id)) {
+            throw new DuplicateHostelNameException("Hostel with name '" + request.getHostelName() + "' already exists");
+        }
+
+        if (StringUtils.hasText(request.getHostelName())) existingHostel.setHostelName(request.getHostelName());
+        if (StringUtils.hasText(request.getLocation())) existingHostel.setLocation(request.getLocation());
+        if (StringUtils.hasText(request.getDescription())) existingHostel.setDescription(request.getDescription());
+        if (request.getHostelPictures() != null) existingHostel.setHostelPictures(request.getHostelPictures());
+
+        Hostel updatedHostel = hostelRepository.save(existingHostel);
+        return mapToHostelResponseDto(updatedHostel);
+    }
+
+    public List<HostelSummaryDto> getAllHostelsSummary() {
+        return hostelRepository.findAll()
+                .stream()
+                .map(this::mapToHostelSummaryDto)
+                .collect(Collectors.toList());
+    }
+
+    public HostelDetailResponseDto getHostelDetailById(Long id) {
+        Hostel hostel = hostelRepository.findById(id)
+                .orElseThrow(() -> new HostelNotFoundException("Hostel not found with ID: " + id));
+
+        return mapToHostelDetailResponseDto(hostel);
+    }
+
+    @Transactional
+    public void deleteHostel(Long id) {
+        Hostel hostel = hostelRepository.findById(id)
+                .orElseThrow(() -> new HostelNotFoundException("Hostel not found with ID: " + id));
+
+        if (hostel.getTotalRooms() > 0) {
+            throw new IllegalStateException("Cannot delete hostel with existing rooms. Remove all rooms first.");
+        }
+
         hostelRepository.deleteById(id);
+    }
+
+    // ======= PRIVATE VALIDATION METHODS =======
+
+    private void validateHostelCreateRequest(HostelCreateRequestDto request) {
+        if (request == null) throw new IllegalArgumentException("Hostel create request cannot be null");
+
+        if (!StringUtils.hasText(request.getHostelName()))
+            throw new IllegalArgumentException("Hostel name is required");
+        if (request.getHostelName().length() < 2 || request.getHostelName().length() > 100)
+            throw new IllegalArgumentException("Hostel name must be between 2 and 100 characters");
+
+        if (!StringUtils.hasText(request.getLocation()))
+            throw new IllegalArgumentException("Location is required");
+        if (request.getLocation().length() > 500)
+            throw new IllegalArgumentException("Location cannot exceed 500 characters");
+
+        if (!StringUtils.hasText(request.getDescription()))
+            throw new IllegalArgumentException("Description is required");
+        if (request.getDescription().length() > 2000)
+            throw new IllegalArgumentException("Description cannot exceed 2000 characters");
+
+        if (request.getManagerId() == null)
+            throw new IllegalArgumentException("Manager ID is required");
+
+        if (request.getHostelPictures() != null) {
+            for (String url : request.getHostelPictures()) {
+                if (url.length() > 2048) // example length check for URL
+                    throw new IllegalArgumentException("Hostel picture URLs cannot exceed 2048 characters");
+            }
+        }
+        // Optional: Validate bank account details here similarly if needed
+    }
+
+    private void validateHostelUpdateRequest(HostelUpdateRequestDto request) {
+        if (request == null) throw new IllegalArgumentException("Hostel update request cannot be null");
+
+        if (request.getHostelName() != null) {
+            if (request.getHostelName().length() < 2 || request.getHostelName().length() > 100)
+                throw new IllegalArgumentException("Hostel name must be between 2 and 100 characters");
+        }
+
+        if (request.getLocation() != null) {
+            if (request.getLocation().length() > 500)
+                throw new IllegalArgumentException("Location cannot exceed 500 characters");
+        }
+
+        if (request.getDescription() != null) {
+            if (request.getDescription().length() > 2000)
+                throw new IllegalArgumentException("Description cannot exceed 2000 characters");
+        }
+
+        if (request.getHostelPictures() != null) {
+            for (String url : request.getHostelPictures()) {
+                if (url.length() > 2048)
+                    throw new IllegalArgumentException("Hostel picture URLs cannot exceed 2048 characters");
+            }
+        }
+    }
+
+    // ======= PRIVATE HELPER METHODS =======
+
+    private User findAndValidateManager(Long managerId) {
+        return userRepository.findById(managerId)
+                .filter(user -> user.getRole() == Role.HOSTEL_MANAGER)
+                .orElseThrow(() -> {
+                    if (userRepository.existsById(managerId)) {
+                        return new ManagerNotFoundException("User with ID " + managerId + " is not a hostel manager");
+                    } else {
+                        return new ManagerNotFoundException("Manager not found with ID: " + managerId);
+                    }
+                });
+    }
+
+    private HostelResponseDto mapToHostelResponseDto(Hostel hostel) {
+        HostelResponseDto dto = new HostelResponseDto();
+        dto.setId(hostel.getId());
+        dto.setHostelName(hostel.getHostelName());
+        dto.setLocation(hostel.getLocation());
+        dto.setDescription(hostel.getDescription());
+        dto.setHostelPictures(hostel.getHostelPictures());
+        dto.setTotalRooms(hostel.getTotalRooms());
+        dto.setAvailableRooms(hostel.getAvailableRooms());
+        dto.setCurrentOccupancy(hostel.getCurrentOccupancy());
+        dto.setTotalOccupancy(hostel.getTotalOccupancy());
+        dto.setMinPrice(hostel.getMinPrice());
+        dto.setMaxPrice(hostel.getMaxPrice());
+        dto.setAverageRatings(hostel.getAverageRatings());
+        dto.setTotalReviews(hostel.getReviews().size());
+        dto.setCreatedAt(hostel.getCreatedAt());
+        dto.setUpdatedAt(hostel.getUpdatedAt());
+        dto.setCheckInTime(hostel.getCheckInTime());
+        dto.setCheckOutTime(hostel.getCheckOutTime());
+        return dto;
+    }
+
+    private HostelSummaryDto mapToHostelSummaryDto(Hostel hostel) {
+        HostelSummaryDto dto = new HostelSummaryDto();
+        dto.setId(hostel.getId());
+        dto.setHostelName(hostel.getHostelName());
+        dto.setLocation(hostel.getLocation());
+        dto.setHostelPictures(hostel.getHostelPictures());
+        dto.setMinPrice(hostel.getMinPrice());
+        dto.setAverageRating(hostel.getAverageRatings());
+        dto.setAvailableRooms(hostel.getAvailableRooms());
+        return dto;
+    }
+
+    private HostelDetailResponseDto mapToHostelDetailResponseDto(Hostel hostel) {
+        HostelDetailResponseDto dto = new HostelDetailResponseDto();
+        dto.setId(hostel.getId());
+        dto.setHostelName(hostel.getHostelName());
+        dto.setLocation(hostel.getLocation());
+        dto.setDescription(hostel.getDescription());
+        dto.setHostelPictures(hostel.getHostelPictures());
+        dto.setTotalRooms(hostel.getTotalRooms());
+        dto.setAvailableRooms(hostel.getAvailableRooms());
+        dto.setCurrentOccupancy(hostel.getCurrentOccupancy());
+        dto.setTotalOccupancy(hostel.getTotalOccupancy());
+        dto.setMinPrice(hostel.getMinPrice());
+        dto.setMaxPrice(hostel.getMaxPrice());
+        dto.setAverageRatings(hostel.getAverageRatings());
+        dto.setTotalReviews(hostel.getReviews().size());
+        dto.setCreatedAt(hostel.getCreatedAt());
+        dto.setUpdatedAt(hostel.getUpdatedAt());
+        dto.setCheckInTime(hostel.getCheckInTime());
+        dto.setCheckOutTime(hostel.getCheckOutTime());
+
+        dto.setManager(mapToManagerResponseDto(hostel.getManager()));
+
+        dto.setRooms(hostel.getRooms().stream()
+                .map(this::mapToRoomResponseDto)
+                .collect(Collectors.toList()));
+
+        dto.setReviews(hostel.getReviews().stream()
+                .map(this::mapToReviewResponseDto)
+                .collect(Collectors.toList()));
+
+        dto.setBankAccountDetails(hostel.getBankAccountDetails().stream()
+                .map(this::mapToBankAccountDetailsResponseDto)
+                .collect(Collectors.toList()));
+
+        return dto;
+    }
+
+    private ManagerResponseDto mapToManagerResponseDto(User user) {
+        ManagerResponseDto dto = new ManagerResponseDto();
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+        dto.setProfileImageUrl(user.getProfilePicture());
+        return dto;
+    }
+
+    private UserSummaryDto mapToUserSummaryDto(User user) {
+        UserSummaryDto dto = new UserSummaryDto();
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+        dto.setProfilePicture(user.getProfilePicture());
+        return dto;
+    }
+    private RoomResponseDto mapToRoomResponseDto(Room room) {
+        if (room == null) return null;
+        RoomResponseDto dto = new RoomResponseDto();
+        dto.setId(room.getId());
+        dto.setRoomNumber(room.getRoomNumber());
+        dto.setRoomCapacity(room.getRoomCapacity());
+        dto.setPricePerBed(room.getPricePerBed());
+        dto.setDescription(room.getDescription());
+        dto.setStatus(room.isAvailable());
+        dto.setRoomPictures(room.getRoomPictures());
+        dto.setAmenities(room.getAmenities());
+        dto.setFloor(room.getFloor());
+        dto.setHasAvailableSpace(room.hasAvailableSpace());
+        dto.setCapacity(room.getCapacity());
+        // add more mappings depending on your RoomResponseDto fields
+        return dto;
+    }
+
+
+    private ReviewResponseDto mapToReviewResponseDto(Review review) {
+        if (review == null) return null;
+        ReviewResponseDto dto = new ReviewResponseDto();
+        dto.setId(review.getId());
+        dto.setRating(review.getRating());
+        dto.setComment(review.getComment());
+        dto.setCreatedAt(review.getCreatedAt());
+        dto.setUser(mapToUserSummaryDto(review.getUser()));
+        // map other fields if needed
+        return dto;
+    }
+
+
+    private BankAccountDetailsResponseDto mapToBankAccountDetailsResponseDto(BankAccountDetails bankAccount) {
+        BankAccountDetailsResponseDto dto = new BankAccountDetailsResponseDto();
+        dto.setAccountName(bankAccount.getAccountName());
+        dto.setBankName(bankAccount.getBankName());
+        dto.setCurrency(bankAccount.getCurrency());
+        dto.setAccountNumber(bankAccount.getAccountNumber());
+        return dto;
     }
 }

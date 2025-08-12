@@ -1,21 +1,25 @@
 package com.example.campus_nest_backend.dto.Responses;
 
-
 import com.example.campus_nest_backend.utils.Role;
 import lombok.AllArgsConstructor;
+
+import java.time.LocalDateTime;
+
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+@Data
+@AllArgsConstructor
 @Setter
 @Getter
-@AllArgsConstructor
-public class UserResponse {
-
+public class UserResponseDto {
     private Long id;
     private String name;
     private String email;
-    private String phoneNumber;
-    private Role role; // e.g., "USER", "ADMIN"
+    private String phone;
+    private Role role;
     private String profilePicture;
+    private LocalDateTime dateJoined;
 
 }

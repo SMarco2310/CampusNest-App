@@ -1,13 +1,15 @@
 package com.example.campus_nest_backend.entity;
 
-
 import com.example.campus_nest_backend.utils.Role;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,53 +23,80 @@ public class User {
     @Column(name = "id")
     private Long id;
 
-    @Column(nullable = false, name = "Name")
+    @NotBlank(message = "Name is required")
+    @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
+    @Column(nullable = false, name = "name")
     private String name;
 
-    @Email
-    @Column(nullable = false, unique = true, name = "Email")
-    private String email;
-
-
-    @Column(nullable = false, name = "Password")
+    @JsonIgnore
+    @NotBlank(message = "Password is required")
+    @Size(min = 6, message = "Password must be at least 6 characters")
+    @Column(nullable = false, name = "password")
     private String password;
 
-    @Column(nullable = false, name = "Phone")
+    @NotBlank(message = "Phone number is required")
+    @Pattern(regexp = "^\\+?[1-9]\\d{1,14}$", message = "Invalid phone number format")
+    @Column(nullable = false, name = "phone")
     private String phone;
 
+    @Email(message = "Invalid email format")
+    @NotBlank(message = "Email is required")
+    @Column(nullable = false, unique = true, name = "email")
+    private String email;
+
+    @NotNull(message = "Role is required")
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, name = "Role")
+    @Column(nullable = false, name = "role")
     private Role role = Role.STUDENT;
 
-    @Column(nullable = true, name = "profile_picture")
-    private String profilePicture;
+    @CreatedDate
+    @Column(name = "date_joined", updatable = false)
+    private LocalDateTime dateJoined;
 
-    // Bookings by user
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id")
+    private Room currentRoom;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Booking> bookings = new ArrayList<>();
 
-    // Reviews by user
+    @Column(name = "profile_picture")
+    private String profilePicture;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 
-//    // Messages sent by user
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Message> messages = new ArrayList<>();
-//
-//    // Chats where user is client
-//    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Chat> clientChats = new ArrayList<>();
-//
-//    // Chats where user is manager
-//    @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Chat> managerChats = new ArrayList<>();
-
-    // Room assigned to user (student)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id")
-    private Room room;
-
     public User() {
-        // Default constructor
+        this.dateJoined = LocalDateTime.now();
+    }
+
+    public User(String name, String password, String phone, String email) {
+        this();
+        this.name = name;
+        this.password = password;
+        this.phone = phone;
+        this.email = email;
+    }
+
+    public void updatePassword(String newPassword) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        this.password = encoder.encode(newPassword);
+    }
+
+    public List<Booking> getBookings() {
+        return new ArrayList<>(this.bookings);
+    }
+
+    public boolean hasActiveBooking() {
+        return bookings.stream()
+                .anyMatch(booking -> booking.isActive());
+    }
+
+    public boolean isStudent() {
+        return this.role == Role.STUDENT;
+    }
+
+    public boolean isManager() {
+        return this.role == Role.HOSTEL_MANAGER;
     }
 }
