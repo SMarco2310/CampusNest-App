@@ -1,5 +1,6 @@
 package com.example.campus_nest_backend.entity;
 
+import com.example.campus_nest_backend.utils.Gender;
 import com.example.campus_nest_backend.utils.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -17,6 +18,9 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "users")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE) // Single table for all user types
+@DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)
+
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,24 +51,19 @@ public class User {
     @NotNull(message = "Role is required")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "role")
-    private Role role = Role.STUDENT;
+    private Role role;
+
+    @Column(name="gender", nullable = false)
+    private Gender gender; // FEMALE,MALE
 
     @CreatedDate
     @Column(name = "date_joined", updatable = false)
     private LocalDateTime dateJoined;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id")
-    private Room currentRoom;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Booking> bookings = new ArrayList<>();
 
     @Column(name = "profile_picture")
     private String profilePicture;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Review> reviews = new ArrayList<>();
 
     public User() {
         this.dateJoined = LocalDateTime.now();
@@ -83,14 +82,7 @@ public class User {
         this.password = encoder.encode(newPassword);
     }
 
-    public List<Booking> getBookings() {
-        return new ArrayList<>(this.bookings);
-    }
 
-    public boolean hasActiveBooking() {
-        return bookings.stream()
-                .anyMatch(Booking::isActive);
-    }
 
     public boolean isStudent() {
         return this.role == Role.STUDENT;
