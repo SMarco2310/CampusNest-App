@@ -221,9 +221,13 @@ public class BookingService {
         dto.setActive(booking.isActive());
         return dto;
     }
-    private UserSummaryDto mapToUserSummary(User user) {
-        return new UserSummaryDto(user.getId(), user.getName(), user.getEmail(),
-                user.getProfilePicture());
+    private UserSummaryDto mapToUserSummary(User user){
+        UserSummaryDto dto = new UserSummaryDto();
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+        return dto;
+
     }
     private RoomWithHostelResponseDto mapToRoomWithHostelResponseDto(Room room) {
         RoomWithHostelResponseDto dto = new RoomWithHostelResponseDto();

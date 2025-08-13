@@ -93,20 +93,23 @@ public class ReviewService {
 
     /* ------------------- Mapping ------------------- */
     private ReviewResponseDto mapToDto(Review review) {
-        return new ReviewResponseDto(
-                review.getId(),
-                review.getComment(),
-
-                review.getRating(),
-                review.getCreatedAt(),
-                mapToUserSummary(userRepository.findUserById(review.getUser().getId())),
-                review.getHostel().getId()
-
-                );
+        ReviewResponseDto responseDto = new ReviewResponseDto();
+        responseDto.setId(review.getId());
+        responseDto.setComment(review.getComment());
+        responseDto.setRating(review.getRating());
+        responseDto.setCreatedAt(review.getCreatedAt());
+        responseDto.setUser(mapToUserSummary(userRepository.findUserById(review.getUser().getId())));
+        responseDto.setHostelId(review.getHostel().getId());
+        return responseDto;
     }
     private UserSummaryDto mapToUserSummary(User user) {
-        return new UserSummaryDto(user.getId(), user.getName(), user.getEmail(),
-                user.getProfilePicture());
+        UserSummaryDto userSummary = new UserSummaryDto();
+        userSummary.setId(user.getId());
+        userSummary.setName(user.getName());
+        userSummary.setEmail(user.getEmail());
+        userSummary.setProfilePicture(user.getProfilePicture()
+        );
+        return userSummary;
     }
 
 }

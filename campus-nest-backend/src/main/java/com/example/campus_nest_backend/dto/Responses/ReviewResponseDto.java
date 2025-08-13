@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@AllArgsConstructor
 public class ReviewResponseDto {
     private Long id;
     private String comment;

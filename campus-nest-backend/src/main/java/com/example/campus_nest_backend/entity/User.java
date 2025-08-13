@@ -89,7 +89,7 @@ public class User {
 
     public boolean hasActiveBooking() {
         return bookings.stream()
-                .anyMatch(booking -> booking.isActive());
+                .anyMatch(Booking::isActive);
     }
 
     public boolean isStudent() {

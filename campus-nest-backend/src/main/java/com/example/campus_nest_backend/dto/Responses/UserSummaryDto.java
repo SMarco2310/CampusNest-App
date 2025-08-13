@@ -9,7 +9,6 @@ import lombok.Setter;
 @Data
 @Setter
 @Getter
-@AllArgsConstructor
 public class UserSummaryDto {
     private Long id;
     private String name;
