@@ -45,7 +45,7 @@ public class UserService implements UserDetailsService {
                 .toList();
     }
 
-    public List<UserResponseDto> getAllManager() {
+    public List<UserResponseDto> getAllManagers() {
         return userRepository.findAllByRole(Role.HOSTEL_MANAGER)
                 .stream()
                 .map(this::mapToUserResponse)
@@ -214,6 +214,7 @@ public class UserService implements UserDetailsService {
                 user.getName(),
                 user.getEmail(),
                 user.getPhone(),
+                user.getGender(),
                 user.getRole(),
                 user.getProfilePicture(),
                 user.getDateJoined()

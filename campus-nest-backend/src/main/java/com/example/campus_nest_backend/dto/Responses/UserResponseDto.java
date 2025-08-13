@@ -1,5 +1,6 @@
 package com.example.campus_nest_backend.dto.Responses;
 
+import com.example.campus_nest_backend.utils.Gender;
 import com.example.campus_nest_backend.utils.Role;
 import lombok.AllArgsConstructor;
 
@@ -18,6 +19,7 @@ public class UserResponseDto {
     private String name;
     private String email;
     private String phone;
+    private Gender gender;
     private Role role;
     private String profilePicture;
     private LocalDateTime dateJoined;
