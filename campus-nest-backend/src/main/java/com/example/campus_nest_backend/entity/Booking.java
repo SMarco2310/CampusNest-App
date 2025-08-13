@@ -24,10 +24,11 @@ public class Booking {
     @Column(name = "id")
     private Long id;
 
-    @NotNull(message = "User is required")
+    @NotNull(message = "Student is required")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "student_id", nullable = false)
+    private Student student;
+
 
     @NotNull(message = "Room is required")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -66,9 +67,9 @@ public class Booking {
         this.bookingDate = LocalDateTime.now();
     }
 
-    public Booking(User user, Room room, LocalDate checkInDate, Status status) {
+    public Booking(Student student, Room room, LocalDate checkInDate, Status status) {
         this();
-        this.user = user;
+        this.student = student;
         this.room = room;
         this.checkInDate = checkInDate;
         this.status = status;

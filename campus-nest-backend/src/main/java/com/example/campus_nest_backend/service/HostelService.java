@@ -36,7 +36,7 @@ public class HostelService {
             throw new DuplicateHostelNameException("Hostel with name '" + request.getHostelName() + "' already exists");
         }
 
-        User manager = findAndValidateManager(request.getManagerId());
+        Hostel_Manager manager = findAndValidateManager(request.getManagerId());
 
         if (hostelRepository.existsByManagerId(manager.getId())) {
             throw new ManagerNotFoundException("Manager is already assigned to another hostel");
@@ -51,7 +51,7 @@ public class HostelService {
         hostel.setCheckInTime(request.getCheckInTime());
         hostel.setCheckOutTime(request.getCheckOutTime());
 
-        List<BankAccountDetails> bankAccounts = request.getBankAccountDetails().stream()
+        List<BankAccountDetails> bankAccounts = manager.getBankAccountDetails().stream()
                 .map(dto -> {
                     BankAccountDetails details = new BankAccountDetails();
                     details.setAccountName(dto.getAccountName());
@@ -179,9 +179,10 @@ public class HostelService {
 
     // ======= PRIVATE HELPER METHODS =======
 
-    private User findAndValidateManager(Long managerId) {
+    private Hostel_Manager findAndValidateManager(Long managerId) {
         return userRepository.findById(managerId)
-                .filter(user -> user.getRole() == Role.HOSTEL_MANAGER)
+                .filter(user -> user instanceof Hostel_Manager)
+                .map(user -> (Hostel_Manager) user)
                 .orElseThrow(() -> {
                     if (userRepository.existsById(managerId)) {
                         return new ManagerNotFoundException("User with ID " + managerId + " is not a hostel manager");
@@ -190,6 +191,7 @@ public class HostelService {
                     }
                 });
     }
+
 
     private HostelResponseDto mapToHostelResponseDto(Hostel hostel) {
         HostelResponseDto dto = new HostelResponseDto();
@@ -305,7 +307,7 @@ public class HostelService {
         dto.setRating(review.getRating());
         dto.setComment(review.getComment());
         dto.setCreatedAt(review.getCreatedAt());
-        dto.setUser(mapToUserSummaryDto(review.getUser()));
+        dto.setUser(mapToUserSummaryDto(review.getStudent()));
         // map other fields if needed
         return dto;
     }

@@ -20,7 +20,7 @@ public class Student extends User{
     private Room currentRoom;
 
     @NotBlank
-    @Column(nullable = false)
+    @Column(nullable = false , unique = true)
     private String studentId;
 
     @NotBlank
@@ -29,6 +29,7 @@ public class Student extends User{
 
     @NotBlank
     @Column(name = "class_year", nullable = false)
+
     private String classYear;
 
 

@@ -31,10 +31,11 @@ public class Review {
     @Column(nullable = false, name = "rating")
     private int rating;
 
-    @NotNull(message = "User is required")
+    @NotNull(message = "Student is required")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "student_id", nullable = false)
+    private Student student;
+
 
     @NotNull(message = "Hostel is required")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -57,9 +58,9 @@ public class Review {
         this.createdAt = LocalDateTime.now();
     }
 
-    public Review(User user, Hostel hostel, int rating, String comment) {
+    public Review(Student student, Hostel hostel, int rating, String comment) {
         this();
-        this.user = user;
+        this.student = student;
         this.hostel = hostel;
         this.rating = rating;
         this.comment = comment;

@@ -4,10 +4,7 @@ import com.example.campus_nest_backend.dto.Requests.BookingCancelRequestDto;
 import com.example.campus_nest_backend.dto.Requests.BookingCreateRequestDto;
 import com.example.campus_nest_backend.dto.Requests.BookingUpdateRequestDto;
 import com.example.campus_nest_backend.dto.Responses.*;
-import com.example.campus_nest_backend.entity.Booking;
-import com.example.campus_nest_backend.entity.Hostel;
-import com.example.campus_nest_backend.entity.Room;
-import com.example.campus_nest_backend.entity.User;
+import com.example.campus_nest_backend.entity.*;
 import com.example.campus_nest_backend.exception.*;
 import com.example.campus_nest_backend.repository.BookingRepository;
 import com.example.campus_nest_backend.repository.HostelRepository;
@@ -36,13 +33,26 @@ public class BookingService {
     public BookingResponseDto createBooking(BookingCreateRequestDto request) {
         validateCreateRequest(request);
 
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + request.getUserId()));
+//        Student user = (Student) userRepository.findById(request.getUserId())
+//                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + request.getUserId()));
+
+        Student studentUser = userRepository.findById(request.getUserId())
+                .map(user -> {
+                    if (user instanceof Student student) {
+                        return student;
+                    }
+                    throw new IllegalArgumentException(
+                            "User with ID " + request.getUserId() + " is not a student"
+                    );
+                })
+                .orElseThrow(() -> new UserNotFoundException(
+                        "User not found with ID: " + request.getUserId()
+                ));
 
         Room room = roomRepository.findById(request.getRoomId())
                 .orElseThrow(() -> new RoomNotFoundException("Room not found with ID: " + request.getRoomId()));
 
-        if (bookingRepository.existsByUserIdAndStatusIn(user.getId(), List.of(Status.PENDING, Status.CONFIRMED))) {
+        if (bookingRepository.existsByUserIdAndStatusIn(studentUser.getId(), List.of(Status.PENDING, Status.CONFIRMED))) {
             throw new UserHasActiveBookingException("User already has an active booking");
         }
 
@@ -51,7 +61,7 @@ public class BookingService {
         }
 
         Booking booking = new Booking();
-        booking.setUser(user);
+        booking.setStudent(studentUser);
         booking.setRoom(room);
         booking.setCheckInDate(request.getCheckInDate());
         booking.setCheckOutDate(request.getCheckOutDate());
@@ -61,11 +71,11 @@ public class BookingService {
         updateRoomOccupancy(room, 1);
         updateHostelAvailableRooms(room.getHostel());
 
-        user.setCurrentRoom(room);
-        userRepository.save(user);
+        studentUser.setCurrentRoom(room);
+        userRepository.save(studentUser);
 
         Booking savedBooking = bookingRepository.save(booking);
-        sendBookingConfirmationEmail(user, room, savedBooking);
+        sendBookingConfirmationEmail(studentUser, room, savedBooking);
 
         return mapToBookingResponseDto(savedBooking);
     }
@@ -98,7 +108,7 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found with ID: " + bookingId));
 
-        if (!booking.getUser().getId().equals(userId)) {
+        if (!booking.getStudent().getId().equals(userId)) {
             throw new IllegalArgumentException("You can only update your own booking");
         }
 
@@ -111,7 +121,7 @@ public class BookingService {
         booking.setTotalAmount(booking.getRoom().getPricePerBed());
 
         Booking updatedBooking = bookingRepository.save(booking);
-        sendBookingUpdateEmail(booking.getUser(), booking.getRoom(), updatedBooking);
+        sendBookingUpdateEmail(booking.getStudent(), booking.getRoom(), updatedBooking);
 
         return mapToBookingResponseDto(updatedBooking);
     }
@@ -122,7 +132,7 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found with ID: " + bookingId));
 
-        if (!booking.getUser().getId().equals(userId)) {
+        if (!booking.getStudent().getId().equals(userId)) {
             throw new IllegalArgumentException("You can only cancel your own booking");
         }
 
@@ -137,7 +147,7 @@ public class BookingService {
         updateHostelAvailableRooms(booking.getRoom().getHostel());
         bookingRepository.save(booking);
 
-        sendBookingCancellationEmail(booking.getUser(), booking.getRoom(), booking);
+        sendBookingCancellationEmail(booking.getStudent(), booking.getRoom(), booking);
     }
 
     /* ------------------- GETTERS ------------------- */
@@ -215,7 +225,7 @@ public class BookingService {
         dto.setStatus(booking.getStatus());
         dto.setTotalAmount(booking.getTotalAmount());
         dto.setRemainingAmount(booking.getTotalAmount());
-        dto.setUser(mapToUserSummary(booking.getUser()));
+        dto.setUser(mapToUserSummary(booking.getStudent()));
         dto.setRoom(mapToRoomWithHostelResponseDto(booking.getRoom()));
         dto.setCanBeCancelled(booking.canBeCancelled());
         dto.setActive(booking.isActive());

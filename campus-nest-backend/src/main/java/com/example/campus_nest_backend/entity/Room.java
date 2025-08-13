@@ -59,7 +59,7 @@ public class Room {
     private Hostel hostel;
 
     @OneToMany(mappedBy = "currentRoom", cascade = CascadeType.ALL)
-    private List<User> occupants = new ArrayList<>();
+    private List<Student> occupants = new ArrayList<>();
 
     @ElementCollection
     @CollectionTable(name = "room_amenities", joinColumns = @JoinColumn(name = "room_id"))
@@ -92,7 +92,7 @@ public class Room {
         return currentOccupancy < capacity && status;
     }
 
-    public boolean addOccupant(User occupant) {
+    public boolean addOccupant(Student occupant) {
         if (hasAvailableSpace()) {
             occupants.add(occupant);
             currentOccupancy++;
@@ -102,7 +102,7 @@ public class Room {
         return false;
     }
 
-    public void removeOccupant(User occupant) {
+    public void removeOccupant(Student occupant) {
         if (occupants.remove(occupant)) {
             currentOccupancy--;
             occupant.setCurrentRoom(null);

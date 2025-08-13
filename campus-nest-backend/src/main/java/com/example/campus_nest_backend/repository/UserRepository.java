@@ -1,9 +1,13 @@
 package com.example.campus_nest_backend.repository;
 
 import com.example.campus_nest_backend.entity.User;
+import com.example.campus_nest_backend.utils.Role;
 import jakarta.validation.constraints.Email;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -16,4 +20,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
 
     boolean existsByEmailAndIdNot(@Email String email, Long id);
+
+    List<User> findAllByRole(Role role);
 }

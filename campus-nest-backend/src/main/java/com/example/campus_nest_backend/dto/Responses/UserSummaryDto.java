@@ -14,4 +14,5 @@ public class UserSummaryDto {
     private String name;
     private String email;
     private String profilePicture;
+
 }

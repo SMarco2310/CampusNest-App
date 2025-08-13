@@ -1,6 +1,7 @@
 package com.example.campus_nest_backend.dto.Requests;
 
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -16,4 +17,11 @@ public class UserUpdateRequestDto {
     private String name;
     private String phone;
     private String profilePicture;
+    @Nullable
+    private String StudentId;
+    @Nullable
+    private String course;
+    @Nullable
+    private String classYear;
+
 }

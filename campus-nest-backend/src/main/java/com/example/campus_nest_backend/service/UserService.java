@@ -5,12 +5,14 @@ import com.example.campus_nest_backend.dto.Requests.UserLoginRequestDto;
 import com.example.campus_nest_backend.dto.Requests.UserRegistrationRequestDto;
 import com.example.campus_nest_backend.dto.Requests.UserUpdateRequestDto;
 import com.example.campus_nest_backend.dto.Responses.UserResponseDto;
-import com.example.campus_nest_backend.entity.User;
+import com.example.campus_nest_backend.entity.*;
 import com.example.campus_nest_backend.exception.DuplicateEmailException;
 import com.example.campus_nest_backend.exception.UserNotFoundException;
+import com.example.campus_nest_backend.repository.RoomRepository;
 import com.example.campus_nest_backend.repository.UserRepository;
 import com.example.campus_nest_backend.utils.Role;
 import com.example.campus_nest_backend.utils.utils;
+import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,17 +23,36 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
-
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    private final RoomRepository roomRepository;
 
     // ===== GET ALL USERS =====
     public List<UserResponseDto> getAllUsers() {
         return userRepository.findAll()
+                .stream()
+                .map(this::mapToUserResponse)
+                .toList();
+    }
+
+    // ===== GET ALL USERS BY ROLE =====
+    public List<UserResponseDto> getAllStudents() {
+        return userRepository.findAllByRole(Role.STUDENT)
+                .stream()
+                .map(this::mapToUserResponse)
+                .toList();
+    }
+
+    public List<UserResponseDto> getAllManager() {
+        return userRepository.findAllByRole(Role.HOSTEL_MANAGER)
+                .stream()
+                .map(this::mapToUserResponse)
+                .toList();
+    }
+    public List<UserResponseDto> getAllAdmins() {
+        return userRepository.findAllByRole(Role.ADMIN)
                 .stream()
                 .map(this::mapToUserResponse)
                 .toList();
@@ -46,18 +67,54 @@ public class UserService implements UserDetailsService {
             throw new DuplicateEmailException("Email already exists: " + request.getEmail());
         }
 
-        User user = new User();
+        User user;
+        // ===== INSTANTIATE BASED ON ROLE =====
+        Role role = request.getRole() != null ? request.getRole() : Role.STUDENT;
+
+        switch (role) {
+            case STUDENT -> {
+                Student student = new Student();
+                student.setStudentId(request.getStudentId());
+                student.setCourse(request.getCourse());
+                student.setClassYear(request.getClassYear());
+
+
+                /*
+                * I can handle this after
+                * */
+                if (request.getCurrentRoomId() != null) {
+                    Room room = roomRepository.findById(request.getCurrentRoomId())
+                            .orElseThrow(() -> new IllegalArgumentException("Room not found with ID: " + request.getCurrentRoomId()));
+                    student.setCurrentRoom(room);
+                }
+
+                user = student;
+            }
+            case HOSTEL_MANAGER -> {
+                if (request.getBankAccountDetails() == null || request.getBankAccountDetails().isEmpty()) {
+                    throw new IllegalArgumentException("Hostel Manager must have at least one bank account detail");
+                }
+                user = new Hostel_Manager();
+            }
+            case ADMIN -> user = new Admin();
+            default -> throw new IllegalArgumentException("Unsupported role: " + role);
+        }
+
+        // ===== COMMON FIELDS =====
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(utils.passwordEncoder.encode(request.getPassword()));
+        user.setGender(request.getGender());
         user.setPhone(request.getPhone());
-        user.setRole(request.getRole() != null ? request.getRole() : Role.STUDENT);
+        user.setRole(role);
         user.setProfilePicture(request.getProfilePicture());
 
         return userRepository.save(user);
     }
 
+
     // ===== UPDATE USER =====
+
     @Transactional
     public UserResponseDto updateUser(Long id, UserUpdateRequestDto request) {
         if (id == null) throw new IllegalArgumentException("User ID cannot be null");
@@ -65,13 +122,21 @@ public class UserService implements UserDetailsService {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + id));
 
-        // Partial updates
+        // ===== COMMON UPDATES =====
         if (StringUtils.hasText(request.getName())) existingUser.setName(request.getName());
         if (StringUtils.hasText(request.getPhone())) existingUser.setPhone(request.getPhone());
         if (request.getProfilePicture() != null) existingUser.setProfilePicture(request.getProfilePicture());
 
+        // ===== TYPE-SPECIFIC UPDATES =====
+        if (existingUser instanceof Student student) {
+            if (StringUtils.hasText(request.getCourse())) student.setCourse(request.getCourse());
+            if (StringUtils.hasText(request.getStudentId())) student.setStudentId(request.getStudentId());
+            if (StringUtils.hasText(request.getClassYear())) student.setClassYear(request.getClassYear());
+        }
+        // Admin has no extra fields for now, but you can add here if needed
         return mapToUserResponse(userRepository.save(existingUser));
     }
+
 
     // ===== UPDATE PASSWORD =====
     @Transactional

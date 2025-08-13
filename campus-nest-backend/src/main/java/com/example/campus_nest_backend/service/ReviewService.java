@@ -6,6 +6,7 @@ import com.example.campus_nest_backend.dto.Responses.ReviewResponseDto;
 import com.example.campus_nest_backend.dto.Responses.UserSummaryDto;
 import com.example.campus_nest_backend.entity.Hostel;
 import com.example.campus_nest_backend.entity.Review;
+import com.example.campus_nest_backend.entity.Student;
 import com.example.campus_nest_backend.entity.User;
 import com.example.campus_nest_backend.repository.HostelRepository;
 import com.example.campus_nest_backend.repository.ReviewRepository;
@@ -26,12 +27,12 @@ public class ReviewService {
 
     public ReviewResponseDto createReview(ReviewCreateRequestDto request) {
         Hostel hostel = validateHostel(request.getHostelId());
-        User user = validateUser(request.getUserId());
+        Student user = validateStudent(request.getUserId());
         validateRating(request.getRating());
 
         Review review = new Review();
         review.setHostel(hostel);
-        review.setUser(user);
+        review.setStudent(user);
         review.setRating(request.getRating());
         review.setComment(request.getComment());
 
@@ -75,10 +76,21 @@ public class ReviewService {
                 .orElseThrow(() -> new IllegalArgumentException("Hostel with ID " + hostelId + " not found"));
     }
 
-    private User validateUser(Long userId) {
-        return userRepository.findById(userId)
+    private Student validateStudent(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User with ID " + userId + " not found"));
+
+        if (!(user instanceof Student student)) {
+            throw new IllegalArgumentException("User with ID " + userId + " is not a student");
+        }
+
+        return student;
     }
+
 
     private Review validateReview(Long reviewId) {
         return reviewRepository.findById(reviewId)
@@ -98,7 +110,7 @@ public class ReviewService {
         responseDto.setComment(review.getComment());
         responseDto.setRating(review.getRating());
         responseDto.setCreatedAt(review.getCreatedAt());
-        responseDto.setUser(mapToUserSummary(userRepository.findUserById(review.getUser().getId())));
+        responseDto.setUser(mapToUserSummary(userRepository.findUserById(review.getStudent().getId())));
         responseDto.setHostelId(review.getHostel().getId());
         return responseDto;
     }
