@@ -52,7 +52,7 @@ public class BookingService {
         Room room = roomRepository.findById(request.getRoomId())
                 .orElseThrow(() -> new RoomNotFoundException("Room not found with ID: " + request.getRoomId()));
 
-        if (bookingRepository.existsByUserIdAndStatusIn(studentUser.getId(), List.of(Status.PENDING, Status.CONFIRMED))) {
+        if (bookingRepository.existsByStudent_IdAndStatusIn(studentUser.getId(), List.of(Status.PENDING, Status.CONFIRMED))) {
             throw new UserHasActiveBookingException("User already has an active booking");
         }
 
@@ -102,13 +102,13 @@ public class BookingService {
 
     /* ------------------- UPDATE BOOKING ------------------- */
     @Transactional
-    public BookingResponseDto updateBooking(Long bookingId, BookingUpdateRequestDto request, Long userId) {
+    public BookingResponseDto updateBooking(Long bookingId, BookingUpdateRequestDto request, Long studentId) {
         validateUpdateRequest(request);
 
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found with ID: " + bookingId));
 
-        if (!booking.getStudent().getId().equals(userId)) {
+        if (!booking.getStudent().getId().equals(studentId)) {
             throw new IllegalArgumentException("You can only update your own booking");
         }
 
@@ -128,11 +128,11 @@ public class BookingService {
 
     /* ------------------- CANCEL BOOKING ------------------- */
     @Transactional
-    public void cancelBooking(Long bookingId, Long userId, BookingCancelRequestDto request) {
+    public void cancelBooking(Long bookingId, Long studentId, BookingCancelRequestDto request) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new BookingNotFoundException("Booking not found with ID: " + bookingId));
 
-        if (!booking.getStudent().getId().equals(userId)) {
+        if (!booking.getStudent().getId().equals(studentId)) {
             throw new IllegalArgumentException("You can only cancel your own booking");
         }
 
@@ -158,8 +158,8 @@ public class BookingService {
         return mapToBookingDetailsDto(booking);
     }
 
-    public List<BookingSummaryDto> getBookingsByUser(Long userId) {
-        return bookingRepository.findBookingsByUserId(userId).stream()
+    public List<BookingSummaryDto> getBookingsByUser(Long studentId) {
+        return bookingRepository.findBookingsByStudent_Id(studentId).stream()
                 .map(this::mapToBookingSummaryDto)
                 .toList();
     }

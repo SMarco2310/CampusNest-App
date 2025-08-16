@@ -20,7 +20,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     Long countByHostelId(Long hostelId);
 
-    boolean existsByUserIdAndHostelId(Long userId, Long hostelId);
+    boolean existsByStudent_idAndHostelId(Long studentId, Long hostelId);
 
-    List<Review> findReviewsByUserId(Long userId);
+    List<Review> findReviewsByStudent_Id(Long studentId);
 }

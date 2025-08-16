@@ -10,15 +10,14 @@ import java.util.Optional;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking,Long> {
-    List<Booking> findBookingsByUserId(Long userId);
 
-    boolean existsByUserId(Long userId);
+    List<Booking> findBookingsByStudent_Id(Long userId);
 
     List<Booking> findBookingsByRoomId(Long roomId);
     
     List<Booking> findBookingsByStatus(Status status);
 
-    boolean existsByUserIdAndStatus(Long id, Status status);
+    boolean existsByStudent_IdAndStatusIn(Long id, List<Status> pending);
 
-    boolean existsByUserIdAndStatusIn(Long id, List<Status> pending);
+
 }

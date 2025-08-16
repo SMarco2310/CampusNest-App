@@ -17,9 +17,6 @@ public interface HostelRepository extends JpaRepository<Hostel,Long> {
     boolean existsByManagerIdAndIdNot(Long id, Long id1);
 
 
-    Arrays findByAvailableRoomsGreaterThan(int i);
-
-
     boolean existsByManagerId(Long id);
 
     boolean existsByHostelNameIgnoreCaseAndIdNot(String hostelName, Long id);

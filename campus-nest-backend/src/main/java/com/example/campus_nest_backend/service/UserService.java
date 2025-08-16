@@ -91,9 +91,9 @@ public class UserService implements UserDetailsService {
                 user = student;
             }
             case HOSTEL_MANAGER -> {
-                if (request.getBankAccountDetails() == null || request.getBankAccountDetails().isEmpty()) {
-                    throw new IllegalArgumentException("Hostel Manager must have at least one bank account detail");
-                }
+//                if (request.getBankAccountDetails() == null || request.getBankAccountDetails().isEmpty()) {
+//                    throw new IllegalArgumentException("Hostel Manager must have at least one bank account detail");
+//                }
                 user = new Hostel_Manager();
             }
             case ADMIN -> user = new Admin();
@@ -130,8 +130,8 @@ public class UserService implements UserDetailsService {
         // ===== TYPE-SPECIFIC UPDATES =====
         if (existingUser instanceof Student student) {
             if (StringUtils.hasText(request.getCourse())) student.setCourse(request.getCourse());
-            if (StringUtils.hasText(request.getStudentId())) student.setStudentId(request.getStudentId());
-            if (StringUtils.hasText(request.getClassYear())) student.setClassYear(request.getClassYear());
+            student.setStudentId(request.getStudentId());
+            student.setClassYear(request.getClassYear());
         }
         // Admin has no extra fields for now, but you can add here if needed
         return mapToUserResponse(userRepository.save(existingUser));

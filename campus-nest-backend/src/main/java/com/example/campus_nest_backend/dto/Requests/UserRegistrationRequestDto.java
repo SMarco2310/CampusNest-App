@@ -4,6 +4,7 @@ import com.example.campus_nest_backend.utils.Gender;
 import com.example.campus_nest_backend.utils.Role;
 
 
+import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -26,11 +27,15 @@ public class UserRegistrationRequestDto {
     private String profilePicture;
 
     // Student-specific
-    private String studentId;
+    @Nullable
+    private Long studentId;
+    @Nullable
     private String course;
-    private String classYear;
+    private Integer classYear;
+    @Nullable
     private Long currentRoomId; // Optional
     // Admin-specific
+    @Nullable
     private List<BankAccountDetailsRequestDto> bankAccountDetails = new ArrayList<>();
 
 }

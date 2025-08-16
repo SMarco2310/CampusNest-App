@@ -13,7 +13,6 @@ import java.util.List;
 @Entity
 @DiscriminatorValue("HOSTEL_MANAGER")
 public class Hostel_Manager extends User{
-
     @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL, orphanRemoval = true)
     List<BankAccountDetails> bankAccountDetails = new ArrayList<>();
 

@@ -53,9 +53,9 @@ public class BookingController {
     public ResponseEntity<ApiResponse<BookingResponseDto>> updateBooking(
             @PathVariable Long bookingId,
             @RequestBody BookingUpdateRequestDto request,
-            @RequestParam Long userId) {
+            @RequestParam Long studentId) {
 
-        BookingResponseDto updatedBooking = bookingService.updateBooking(bookingId, request, userId);
+        BookingResponseDto updatedBooking = bookingService.updateBooking(bookingId, request, studentId);
         return ResponseEntity.ok(new ApiResponse<>(200, true, "Booking updated successfully", updatedBooking));
     }
 
@@ -63,10 +63,10 @@ public class BookingController {
     @DeleteMapping("/{bookingId}")
     public ResponseEntity<ApiResponse<Void>> cancelBooking(
             @PathVariable Long bookingId,
-            @RequestParam Long userId,
+            @RequestParam Long studentId,
             @RequestBody BookingCancelRequestDto request) {
 
-        bookingService.cancelBooking(bookingId, userId, request);
+        bookingService.cancelBooking(bookingId, studentId, request);
         return ResponseEntity.ok(new ApiResponse<>(200, true, "Booking cancelled successfully", null));
     }
 

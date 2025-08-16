@@ -73,7 +73,8 @@ public class Hostel {
     @Column(name = "check_out_time")
     private LocalTime checkOutTime;
 
-    List<BankAccountDetails> bankAccountDetails = new ArrayList<>();
+    @OneToMany(mappedBy = "hostel", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BankAccountDetails> bankAccountDetails = new ArrayList<>();
 
     public Hostel() {
         this.createdAt = LocalDateTime.now();

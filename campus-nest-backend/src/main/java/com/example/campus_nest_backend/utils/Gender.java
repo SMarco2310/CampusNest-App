@@ -1,8 +1,9 @@
 package com.example.campus_nest_backend.utils;
 
 public enum Gender {
-    MALE("Male"),
-    FEMALE("Female");
+
+    FEMALE("Female"),
+    MALE("Male");
 
     private final String genderName;
 

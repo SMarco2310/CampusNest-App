@@ -2,11 +2,15 @@ package com.example.campus_nest_backend.entity;
 
 
 import com.example.campus_nest_backend.utils.Role;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.NumberFormat;
 
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,18 +23,16 @@ public class Student extends User{
     @JoinColumn(name = "room_id")
     private Room currentRoom;
 
-    @NotBlank
-    @Column(nullable = false , unique = true)
-    private String studentId;
+    @Column(unique = true)
+    @NumberFormat(pattern = "########")
+    private Long studentId;
 
-    @NotBlank
-    @Column(nullable = false)
+    @Column(name = "course")
     private String course;
 
-    @NotBlank
-    @Column(name = "class_year", nullable = false)
-
-    private String classYear;
+    @Column(name = "class_year")
+    @NumberFormat(pattern = "####")
+    private Integer classYear;
 
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)

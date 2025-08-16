@@ -11,8 +11,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+
 
 @Getter
 @Setter
@@ -53,6 +52,7 @@ public class User {
     @Column(nullable = false, name = "role")
     private Role role;
 
+    @Enumerated(EnumType.STRING)
     @Column(name="gender", nullable = false)
     private Gender gender; // FEMALE,MALE
 
@@ -62,7 +62,7 @@ public class User {
 
 
     @Column(name = "profile_picture")
-    private String profilePicture;
+    private String profilePicture = null; // Default profile picture
 
 
     public User() {
