@@ -9,9 +9,9 @@ function HostelSearchPage() {
   const [filteredHostels, setFilteredHostels] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/hostels/hostels")
+    fetch("http://localhost:5000/api/hostels/summary")
       .then((response) => response.json())
-      .then((data) => setHostels(data.hostels));
+      .then((data) => setHostels(data.data));
   }, []);
 
   useEffect(() => {

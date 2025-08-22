@@ -53,6 +53,11 @@ public class Booking {
     @Column(nullable = false, name = "status")
     private Status status = Status.PENDING;
 
+    @Max(4)
+    @Min(0)
+    @Column(name = "payment_mode_index",nullable = false)
+    private int paymentModeIndex = 0; // 0 for Paystack, 1 for Bank Transfer, etc.
+
     @DecimalMin(value = "0.0", message = "Total amount cannot be negative")
     @Column(nullable = false, name = "total_amount", precision = 10, scale = 2)
     private BigDecimal totalAmount = BigDecimal.ZERO;

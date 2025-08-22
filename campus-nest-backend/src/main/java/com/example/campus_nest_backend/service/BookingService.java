@@ -66,6 +66,7 @@ public class BookingService {
         booking.setCheckInDate(request.getCheckInDate());
         booking.setCheckOutDate(request.getCheckOutDate());
         booking.setStatus(Status.PENDING);
+        booking.setPaymentModeIndex(request.getPaymentModeIndex());
         booking.setTotalAmount(room.getPricePerBed());
 
         updateRoomOccupancy(room, 1);
@@ -119,7 +120,7 @@ public class BookingService {
         booking.setCheckInDate(request.getCheckInDate());
         booking.setCheckOutDate(request.getCheckOutDate());
         booking.setTotalAmount(booking.getRoom().getPricePerBed());
-
+        booking.setPaymentModeIndex(request.getPaymentModeIndex());
         Booking updatedBooking = bookingRepository.save(booking);
         sendBookingUpdateEmail(booking.getStudent(), booking.getRoom(), updatedBooking);
 

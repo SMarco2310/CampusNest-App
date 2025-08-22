@@ -35,28 +35,6 @@ public class UserController {
         );
     }
 
-    @GetMapping("/Managers")
-    public ResponseEntity<ApiResponse<List<UserResponseDto>>> getAllManagers() {
-        List<UserResponseDto> managers = userService.getAllManagers();
-        return ResponseEntity.ok(
-                new ApiResponse<>(HttpStatus.OK.value(), true, "Managers fetched successfully", managers)
-        );
-    }
-    @GetMapping("/Students")
-    public ResponseEntity<ApiResponse<List<UserResponseDto>>> getAllStudents() {
-        List<UserResponseDto> students = userService.getAllStudents();
-        return ResponseEntity.ok(
-                new ApiResponse<>(HttpStatus.OK.value(), true, "Students fetched successfully", students)
-        );
-    }
-
-    @GetMapping("/Admins")
-    public ResponseEntity<ApiResponse<List<UserResponseDto>>> getAllAdmins() {
-        List<UserResponseDto> admins = userService.getAllAdmins();
-        return ResponseEntity.ok(
-                new ApiResponse<>(HttpStatus.OK.value(), true, "Admins fetched successfully", admins)
-        );
-    }
 
     @PutMapping("/{id}/password")
     public ResponseEntity<ApiResponse<Void>> updatePassword(

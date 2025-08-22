@@ -28,6 +28,12 @@ public class BankAccountDetails {
     @Column(name = "bank_name", nullable = false, length = 100)
     private String bankName;
 
+    @NotBlank(message = "Bank code cannot be blank")
+    @Size(max = 20, message = "Bank code must be at most 20 characters")
+    @Pattern(regexp = "^[0-9A-Za-z]+$", message = "Bank code must contain only letters and digits")
+    @Column(name = "bank_code", nullable = false, length = 20)
+    private String bankCode;
+
     @NotBlank(message = "Currency cannot be blank")
     @Size(max = 10, message = "Currency code must be at most 10 characters")
     @Pattern(regexp = "^[A-Z]{3}$", message = "Currency must be a valid 3-letter ISO code (e.g., USD, GHS)")

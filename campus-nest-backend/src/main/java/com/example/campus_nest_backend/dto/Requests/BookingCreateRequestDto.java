@@ -14,4 +14,5 @@ public class BookingCreateRequestDto {
     private LocalDate checkOutDate;
     private Long userId;
     private int durationMonths;
+    private int paymentModeIndex; // 0 for Paystack, 1 for Bank Transfer, etc.
 }

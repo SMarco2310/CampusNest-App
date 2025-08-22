@@ -54,6 +54,10 @@ public class Hostel {
     @OneToMany(mappedBy = "hostel", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 
+
+    @OneToMany(mappedBy = "hostel", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("createdAt DESC")
+    private List<Complaint> complaints = new ArrayList<>();
     @Min(value = 0, message = "Total rooms cannot be negative")
     @Column(nullable = false, name = "total_rooms")
     private int totalRooms = 0;
