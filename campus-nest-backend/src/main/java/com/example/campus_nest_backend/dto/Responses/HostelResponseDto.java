@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -24,8 +25,8 @@ public class HostelResponseDto {
     private BigDecimal maxPrice;
     private BigDecimal averageRatings;
     private int totalReviews;
-    private LocalDateTime createdAt;
+    private LocalDate createdAt;
     private LocalDateTime updatedAt;
-    private LocalTime checkInTime;
-    private LocalTime checkOutTime;
+    private LocalDateTime checkInTime;
+    private LocalDateTime checkOutTime;
 }

@@ -17,9 +17,7 @@ public class UserUpdateRequestDto {
     private String name;
     private String phone;
     private String profilePicture;
-    @Nullable
     private Long StudentId;
-    @Nullable
     private String course;
     private Integer classYear;
 

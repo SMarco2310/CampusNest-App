@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Setter
@@ -16,8 +15,8 @@ import java.time.LocalDateTime;
 public class BookingResponseDto {
     private Long id;
     private LocalDateTime bookingDate;
-    private LocalDate checkInDate;
-    private LocalDate checkOutDate;
+    private LocalDateTime checkInDate;
+    private LocalDateTime checkOutDate;
     private Status status;
     private BigDecimal totalAmount;
     private BigDecimal amountPaid;

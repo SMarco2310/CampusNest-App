@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .and()
                 .csrf().disable()
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints (no auth needed)
+                        // Public endpoints
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/api/hostels/summary",
@@ -37,47 +37,59 @@ public class SecurityConfig {
                                 "/api/hostels/{hostelId}/rooms",
                                 "/api/rooms/{roomId}",
                                 "/api/reviews/{id}",
-                                "/api/reviews" // for POST review (maybe should be protected, but you decide)
+                                "/api/reviews",
+                                "/api/admin/login",
+                                "/api/admin/register",
+                                "/api/payments/webhook"
                         ).permitAll()
 
                         // Admin-only endpoints
                         .requestMatchers(
-                                "/api/users",              // GET all users
-                                "/api/users/{id}",         // DELETE user
-                                "/api/bookings",           // GET all bookings (admin overview)
-                                "/api/bookings/room/{roomId}",  // GET bookings by room
-                                "/api/bookings/hostel/{hostelId}" // GET bookings by hostel
+                                "/api/admin/**",        // all admin actions except login/register
+                                "/api/users",
+                                "/api/users/{id}",
+                                "/api/bookings"
                         ).hasRole("ADMIN")
 
                         // Hostel Manager-only endpoints
                         .requestMatchers(
-                                "/api/hostels",            // POST create hostel
-                                "/api/hostels/{id}",       // PUT update hostel
-                                "/api/hostels/{id}",       // DELETE hostel
-                                "/api/rooms",              // POST create room
-                                "/api/rooms/{roomId}",     // PUT update room
-                                "/api/rooms/{roomId}",     // DELETE room
-                                "/api/bookings/{bookingId}", // PUT update booking (manager can update)
-                                "/api/bookings/{bookingId}", // DELETE booking (cancel)
-                                "/api/rooms/occupant/room/{roomId}" // if exists for manager
+                                "/api/hostels",
+                                "/api/hostels/{id}",
+                                "/api/rooms",
+                                "/api/rooms/{roomId}",
+                                "/api/bookings/{bookingId}",
+                                "/api/rooms/occupant/room/{roomId}"
                         ).hasRole("HOSTEL_MANAGER")
 
-                        // Endpoints accessible to any authenticated user (students, managers, admin)
+                        // Complaints – Admin + Hostel Manager
                         .requestMatchers(
-                                "/api/users/{id}",           // user details (allow self or roles)
-                                "/api/users/{id}",         // GET user by id (could be user or admin)
-                                "/api/users/{id}/password",// PUT update password
-                                "/api/users/{id}",         // PUT update user
-                                "/api/bookings/user/{userId}", // user bookings
-                                "/api/bookings",             // POST create booking
-                                "/api/reviews",              // POST review
-                                "/api/reviews/{id}",         // PUT and DELETE review
-                                "/api/reviews/{id}"          // GET review by id (public above, but repeated here for auth)
+                                "/api/complaints",
+                                "/api/complaints/{id}",
+                                "/api/bookings/room/{roomId}",
+
+                                "/api/complaints/student/{studentId}",
+                                "/api/bookings/hostel/{hostelId}",
+
+                                "/api/complaints/hostelManager/{hostelManagerId}"
+                        ).hasAnyRole("ADMIN", "HOSTEL_MANAGER")
+
+                        // Authenticated users (student, manager, admin)
+                        .requestMatchers(
+                                "/api/users/{id}",
+                                "/api/users/{id}/password",
+                                "/api/bookings/user/{userId}",
+                                "/api/bookings",
+                                "/api/reviews",
+                                "/api/reviews/{id}",
+                                "/api/payments/initialize",
+                                "/api/payments/verify/**",
+                                "/api/complaints" // create complaint
                         ).hasAnyRole("STUDENT", "HOSTEL_MANAGER", "ADMIN")
 
-                        // All other requests must be authenticated
+                        // All other requests
                         .anyRequest().authenticated()
                 )
+
                 .sessionManagement(sess -> sess
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );

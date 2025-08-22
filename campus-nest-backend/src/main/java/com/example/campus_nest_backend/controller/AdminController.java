@@ -34,7 +34,7 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(
                 HttpStatus.CREATED.value(),
                 true,
-                "User registered successfully",
+                "Admin registered successfully",
                 new LoginResponseDto(token, user.getId())
         ));
     }
@@ -49,7 +49,7 @@ public class AdminController {
             return ResponseEntity.ok(new ApiResponse<>(
                     HttpStatus.OK.value(),
                     true,
-                    "User logged in successfully",
+                    "Admin logged in successfully",
                     new LoginResponseDto(token, user.getId())
             ));
         } catch (Exception e) {

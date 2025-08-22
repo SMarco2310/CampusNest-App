@@ -133,6 +133,7 @@ public class UserService implements UserDetailsService {
             student.setStudentId(request.getStudentId());
             student.setClassYear(request.getClassYear());
         }
+
         // Admin has no extra fields for now, but you can add here if needed
         return mapToUserResponse(userRepository.save(existingUser));
     }

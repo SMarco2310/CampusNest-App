@@ -52,12 +52,17 @@ public class ComplaintController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
-
-    @GetMapping("/hostel/{hostelId}")
-    public ResponseEntity<List<Complaint>> getComplaintsByHostel(@PathVariable Long hostelId) {
-        List<Complaint> complaints = complaintService.getComplaintsByHostel(hostelId);
+    @GetMapping("/hostelManager/{hostelManagerId}")
+    public ResponseEntity<List<Complaint>> getComplaintsByHostelManagerId(@PathVariable
+            Long hostelManagerId) {
+        List<Complaint> complaints = complaintService.getComplaintsByHostelManagerId(hostelManagerId);
+        if (complaints == null) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(complaints);
     }
+
+
     // Delete complaint
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteComplaint(@PathVariable Long id) {

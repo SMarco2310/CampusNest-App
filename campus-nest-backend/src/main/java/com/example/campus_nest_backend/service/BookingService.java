@@ -31,7 +31,6 @@ public class BookingService {
     /* ------------------- CREATE BOOKING ------------------- */
     @Transactional
     public BookingResponseDto createBooking(BookingCreateRequestDto request) {
-        validateCreateRequest(request);
 
 //        Student user = (Student) userRepository.findById(request.getUserId())
 //                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + request.getUserId()));
@@ -59,12 +58,13 @@ public class BookingService {
         if (!isRoomAvailable(room)) {
             throw new RoomUnavailableException("Room is not available or is at full capacity");
         }
+        Hostel hostel = room.getHostel();
 
         Booking booking = new Booking();
         booking.setStudent(studentUser);
         booking.setRoom(room);
-        booking.setCheckInDate(request.getCheckInDate());
-        booking.setCheckOutDate(request.getCheckOutDate());
+        booking.setCheckInDate(hostel.getCheckInTime());
+        booking.setCheckOutDate(hostel.getCheckOutTime());
         booking.setStatus(Status.PENDING);
         booking.setPaymentModeIndex(request.getPaymentModeIndex());
         booking.setTotalAmount(room.getPricePerBed());
@@ -166,14 +166,6 @@ public class BookingService {
     }
 
     /* ------------------- VALIDATION ------------------- */
-    private void validateCreateRequest(BookingCreateRequestDto request) {
-        if (request.getCheckInDate() == null || request.getCheckOutDate() == null) {
-            throw new IllegalArgumentException("Check-in and check-out dates are required");
-        }
-        if (!request.getCheckOutDate().isAfter(request.getCheckInDate())) {
-            throw new IllegalArgumentException("Check-out date must be after check-in date");
-        }
-    }
 
     private void validateUpdateRequest(BookingUpdateRequestDto request) {
         if (request.getCheckInDate() == null || request.getCheckOutDate() == null) {

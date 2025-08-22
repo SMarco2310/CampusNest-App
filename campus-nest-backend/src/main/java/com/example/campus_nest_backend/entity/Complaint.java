@@ -29,7 +29,7 @@ public class Complaint {
 
     @ManyToOne
     @JoinColumn(name = "hostel_Manager_id", nullable = true)
-    private Hostel_Manager hostel; // The hostel related to the complaint
+    private Hostel_Manager hostelManager; // The hostel related to the complaint
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

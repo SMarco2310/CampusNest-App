@@ -1,5 +1,6 @@
 package com.example.campus_nest_backend.dto.Requests;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -31,8 +32,8 @@ public class HostelCreateRequestDto {
     @NotNull(message = "Manager ID is required")
     private Long managerId;
 
-    private LocalTime checkInTime;
-    private LocalTime checkOutTime;
+    private LocalDateTime checkInTime;
+    private LocalDateTime checkOutTime;
 
     private List<BankAccountDetailsRequestDto> bankAccountDetails = new ArrayList<>();
 }

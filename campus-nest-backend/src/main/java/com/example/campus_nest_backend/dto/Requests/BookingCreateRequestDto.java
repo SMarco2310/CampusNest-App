@@ -4,15 +4,11 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
 @Setter
 @Getter
 @Data
 public class BookingCreateRequestDto {
     private Long roomId;
-    private LocalDate checkInDate;
-    private LocalDate checkOutDate;
     private Long userId;
-    private int durationMonths;
     private int paymentModeIndex; // 0 for Paystack, 1 for Bank Transfer, etc.
 }

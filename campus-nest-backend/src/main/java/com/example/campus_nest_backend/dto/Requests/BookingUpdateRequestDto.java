@@ -4,14 +4,15 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Data
 public class BookingUpdateRequestDto {
-    private LocalDate checkInDate;
-    private LocalDate checkOutDate;
+    private LocalDateTime checkInDate;
+    private LocalDateTime checkOutDate;
     private int durationMonths;
     private int paymentModeIndex; // 0 for Paystack, 1 for Bank Transfer, etc.
 }

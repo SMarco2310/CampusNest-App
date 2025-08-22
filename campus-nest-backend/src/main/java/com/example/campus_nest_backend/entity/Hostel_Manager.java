@@ -19,6 +19,8 @@ public class Hostel_Manager extends User{
     @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Hostel> ownedHostels = new ArrayList<>();
 
+    @OneToMany(mappedBy = "hostelManager", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Complaint> assignedComplaints = new ArrayList<>();
 
     public Hostel_Manager() {
         setRole(Role.HOSTEL_MANAGER);

@@ -22,7 +22,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PaymentService {
 
-    @Value("${paystack.secret}")
+    @Value("${paystack.secret.key}")
     private String PAYSTACK_SECRET;
 
     private final ObjectMapper mapper = new ObjectMapper();

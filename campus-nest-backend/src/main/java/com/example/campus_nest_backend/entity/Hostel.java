@@ -8,6 +8,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -54,17 +55,13 @@ public class Hostel {
     @OneToMany(mappedBy = "hostel", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 
-
-    @OneToMany(mappedBy = "hostel", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("createdAt DESC")
-    private List<Complaint> complaints = new ArrayList<>();
     @Min(value = 0, message = "Total rooms cannot be negative")
     @Column(nullable = false, name = "total_rooms")
     private int totalRooms = 0;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    private LocalDate createdAt;
 
     @LastModifiedDate
     @Column(name = "updated_at")
@@ -72,16 +69,16 @@ public class Hostel {
 
     // Optional fields
     @Column(name = "check_in_time")
-    private LocalTime checkInTime;
+    private LocalDateTime checkInTime;
 
     @Column(name = "check_out_time")
-    private LocalTime checkOutTime;
+    private LocalDateTime checkOutTime;
 
     @OneToMany(mappedBy = "hostel", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BankAccountDetails> bankAccountDetails = new ArrayList<>();
 
     public Hostel() {
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDate.now();
     }
 
     public Hostel(String hostelName, String location, String description, List<String> hostelPictures) {

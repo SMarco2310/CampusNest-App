@@ -1,10 +1,14 @@
 package com.example.campus_nest_backend.service;
 
 import com.example.campus_nest_backend.entity.Complaint;
+import com.example.campus_nest_backend.entity.Hostel_Manager;
 import com.example.campus_nest_backend.entity.Student;
 import com.example.campus_nest_backend.repository.ComplaintRepository;
+import com.example.campus_nest_backend.repository.UserRepository;
+import com.example.campus_nest_backend.utils.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.View;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +18,8 @@ import java.util.Optional;
 public class ComplaintService {
 
     private final ComplaintRepository complaintRepository;
+    private final UserRepository userRepository;
+
 
     // Create a new complaint
     public Complaint createComplaint(Complaint complaint) {
@@ -44,8 +50,12 @@ public class ComplaintService {
     public void deleteComplaint(Long id) {
         complaintRepository.deleteById(id);
     }
-
-    public List<Complaint> getComplaintsByHostel(Long hostel_id) {
-        return complaintRepository.findByHostel_Id(hostel_id);
+    public List<Complaint> getComplaintsByHostelManagerId(Long hostel_ManagerId) {
+        Hostel_Manager hostelManager = userRepository.findUserByIdAndRole(hostel_ManagerId, Role.HOSTEL_MANAGER);
+        if (hostelManager == null) {
+            System.out.println("Hostel Manager not found with ID: " + hostel_ManagerId);
+            return null;
+        }
+        return complaintRepository.findByHostelManager(hostelManager);
     }
 }

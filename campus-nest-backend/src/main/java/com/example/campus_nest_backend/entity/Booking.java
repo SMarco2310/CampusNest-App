@@ -42,11 +42,11 @@ public class Booking {
     @NotNull(message = "Check-in date is required")
     @Future(message = "Check-in date must be in the future")
     @Column(nullable = false, name = "check_in_date")
-    private LocalDate checkInDate;
+    private LocalDateTime checkInDate;
 
     @NotNull(message = "Check-out date is required")
     @Column(nullable = false, name = "check_out_date")
-    private LocalDate checkOutDate;
+    private LocalDateTime checkOutDate;
 
     @NotNull(message = "Status is required")
     @Enumerated(EnumType.STRING)
@@ -72,7 +72,7 @@ public class Booking {
         this.bookingDate = LocalDateTime.now();
     }
 
-    public Booking(Student student, Room room, LocalDate checkInDate, Status status) {
+    public Booking(Student student, Room room, LocalDateTime checkInDate, Status status) {
         this();
         this.student = student;
         this.room = room;
@@ -95,11 +95,11 @@ public class Booking {
 
     public boolean canBeCancelled() {
         return (status == Status.PENDING || status == Status.CONFIRMED) &&
-                checkInDate.isAfter(LocalDate.now());
+                checkInDate.isAfter(LocalDateTime.now());
     }
 
     public boolean isActive() {
-        LocalDate now = LocalDate.now();
+        LocalDateTime now = LocalDateTime.now();
         return status == Status.CONFIRMED &&
                 !now.isBefore(checkInDate) &&
                 !now.isAfter(checkOutDate);

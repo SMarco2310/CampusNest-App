@@ -1,5 +1,6 @@
 package com.example.campus_nest_backend.repository;
 
+import com.example.campus_nest_backend.entity.Hostel_Manager;
 import com.example.campus_nest_backend.entity.User;
 import com.example.campus_nest_backend.utils.Role;
 import jakarta.validation.constraints.Email;
@@ -22,4 +23,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmailAndIdNot(@Email String email, Long id);
 
     List<User> findAllByRole(Role role);
+
+    Hostel_Manager findUserByIdAndRole(Long hostelManagerId,Role role);
 }
