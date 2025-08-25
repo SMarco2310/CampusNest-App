@@ -1,13 +1,11 @@
 package com.example.campus_nest_backend.service;
 
-import com.example.campus_nest_backend.dto.Requests.PasswordUpdateRequestDto;
-import com.example.campus_nest_backend.dto.Requests.UserLoginRequestDto;
-import com.example.campus_nest_backend.dto.Requests.UserRegistrationRequestDto;
-import com.example.campus_nest_backend.dto.Requests.UserUpdateRequestDto;
+import com.example.campus_nest_backend.dto.Requests.*;
 import com.example.campus_nest_backend.dto.Responses.UserResponseDto;
 import com.example.campus_nest_backend.entity.*;
 import com.example.campus_nest_backend.exception.DuplicateEmailException;
 import com.example.campus_nest_backend.exception.UserNotFoundException;
+import com.example.campus_nest_backend.repository.HostelRepository;
 import com.example.campus_nest_backend.repository.RoomRepository;
 import com.example.campus_nest_backend.repository.UserRepository;
 import com.example.campus_nest_backend.utils.Role;
@@ -21,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -28,6 +27,7 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
+    private final HostelRepository hostelRepository;
 
     // ===== GET ALL USERS =====
     public List<UserResponseDto> getAllUsers() {
@@ -68,7 +68,6 @@ public class UserService implements UserDetailsService {
         }
 
         User user;
-        // ===== INSTANTIATE BASED ON ROLE =====
         Role role = request.getRole() != null ? request.getRole() : Role.STUDENT;
 
         switch (role) {
@@ -78,10 +77,6 @@ public class UserService implements UserDetailsService {
                 student.setCourse(request.getCourse());
                 student.setClassYear(request.getClassYear());
 
-
-                /*
-                * I can handle this after
-                * */
                 if (request.getCurrentRoomId() != null) {
                     Room room = roomRepository.findById(request.getCurrentRoomId())
                             .orElseThrow(() -> new IllegalArgumentException("Room not found with ID: " + request.getCurrentRoomId()));
@@ -90,13 +85,26 @@ public class UserService implements UserDetailsService {
 
                 user = student;
             }
+
             case HOSTEL_MANAGER -> {
-//                if (request.getBankAccountDetails() == null || request.getBankAccountDetails().isEmpty()) {
-//                    throw new IllegalArgumentException("Hostel Manager must have at least one bank account detail");
-//                }
-                user = new Hostel_Manager();
+                Hostel_Manager manager = new Hostel_Manager();
+
+                if (request.getBankAccountDetails() != null && !request.getBankAccountDetails().isEmpty()) {
+                    List<BankAccountDetails> accounts = request.getBankAccountDetails()
+                            .stream()
+                            .map(this::toEntity)
+                            .peek(acc -> acc.setManager(manager))   // 🔥 set back-reference
+                            .toList();
+
+                    manager.setBankAccountDetails(accounts);
+//                    manager.getOwnedHostels().forEach(hostel -> hostel.setBankAccountDetails(accounts));
+                }
+
+                user = manager;
             }
+
             case ADMIN -> user = new Admin();
+
             default -> throw new IllegalArgumentException("Unsupported role: " + role);
         }
 
@@ -169,12 +177,19 @@ public class UserService implements UserDetailsService {
 
         List<BankAccountDetails> accounts = bankDetails.stream()
                 .map(this::toEntity)
-                .peek(acc -> acc.setManager(manager))   // 🔥 set back-reference
-                .toList();
+                .peek(acc -> acc.setManager(manager)) // set back-reference
+                .collect(Collectors.toList());
 
-        manager.setBankAccountDetails(accounts);
+
+//         ✅ Mutate collection instead of replacing
+        manager.getBankAccountDetails().clear();
+        manager.getBankAccountDetails().addAll(accounts);
+//        manager.getOwnedHostels().forEach(hostel -> hostel.setBankAccountDetails(accounts));
+
+
         userRepository.save(manager);
     }
+
 
     // ===== DELETE USER =====
     @Transactional

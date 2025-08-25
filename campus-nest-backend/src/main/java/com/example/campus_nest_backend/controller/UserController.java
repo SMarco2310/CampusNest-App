@@ -1,13 +1,16 @@
 package com.example.campus_nest_backend.controller;
 
+import com.example.campus_nest_backend.dto.Requests.BankAccountDetailsRequestDto;
 import com.example.campus_nest_backend.dto.Requests.PasswordUpdateRequestDto;
 import com.example.campus_nest_backend.dto.Requests.UserUpdateRequestDto;
 import com.example.campus_nest_backend.dto.Responses.ApiResponse;
 import com.example.campus_nest_backend.dto.Responses.UserResponseDto;
 import com.example.campus_nest_backend.service.UserService;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,6 +47,17 @@ public class UserController {
         userService.updatePassword(id, passwordUpdateRequest);
         return ResponseEntity.ok(
                 new ApiResponse<>(HttpStatus.OK.value(), true, "Password updated successfully", null)
+        );
+    }
+
+    @PutMapping("/bank-details/{hostelManagerId}")
+    @PreAuthorize("hasRole('HOSTEL_MANAGER')") // only admins can call this
+    public ResponseEntity<ApiResponse<Void>> updateBankDetails(
+            @PathVariable Long hostelManagerId,
+            @RequestBody List<BankAccountDetailsRequestDto> bankDetails) {
+        userService.updateBankDetails(hostelManagerId, bankDetails);
+        return ResponseEntity.ok(
+                new ApiResponse<>(HttpStatus.OK.value(), true, "Bank details added successfully", null)
         );
     }
 

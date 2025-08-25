@@ -60,6 +60,7 @@ public class HostelService {
                     details.setAccountNumber(dto.getAccountNumber());
                     return details;
                 })
+                .peek(details -> {details.setHostel(hostel);})
                 .collect(Collectors.toList());
 
         hostel.setBankAccountDetails(bankAccounts);
@@ -258,7 +259,8 @@ public class HostelService {
                 .collect(Collectors.toList()));
 
         dto.setBankAccountDetails(hostel.getBankAccountDetails().stream()
-                .map(this::mapToBankAccountDetailsResponseDto)
+                .map(this::toResponseDto)
+
                 .collect(Collectors.toList()));
 
         return dto;
@@ -313,12 +315,17 @@ public class HostelService {
     }
 
 
-    private BankAccountDetailsResponseDto mapToBankAccountDetailsResponseDto(BankAccountDetails bankAccount) {
+    public  BankAccountDetailsResponseDto toResponseDto(BankAccountDetails entity) {
+        if (entity == null) {
+            return null;
+        }
+
         BankAccountDetailsResponseDto dto = new BankAccountDetailsResponseDto();
-        dto.setAccountName(bankAccount.getAccountName());
-        dto.setBankName(bankAccount.getBankName());
-        dto.setCurrency(bankAccount.getCurrency());
-        dto.setAccountNumber(bankAccount.getAccountNumber());
+        dto.setAccountName(entity.getAccountName());
+        dto.setBankName(entity.getBankName());
+        dto.setBankCode(entity.getBankCode());
+        dto.setCurrency(entity.getCurrency());
+        dto.setAccountNumber(entity.getAccountNumber());
         return dto;
     }
 }

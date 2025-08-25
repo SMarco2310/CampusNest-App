@@ -56,6 +56,7 @@ public class SecurityConfig {
                                 "/api/hostels",
                                 "/api/hostels/{id}",
                                 "/api/rooms",
+                                "/api/users/bank-details/{hostelManagerId}",
                                 "/api/rooms/{roomId}",
                                 "/api/bookings/{bookingId}",
                                 "/api/rooms/occupant/room/{roomId}"

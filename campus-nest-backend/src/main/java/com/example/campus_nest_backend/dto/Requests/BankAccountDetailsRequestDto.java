@@ -13,9 +13,14 @@ public class BankAccountDetailsRequestDto {
     @NotBlank(message = "Bank name is required")
     private String bankName;
 
+    @NotBlank(message = "Bank code is required")
+    private String bankCode;
     @NotBlank(message = "Currency is required")
     private String currency;
 
     @NotBlank(message = "Account number is required")
     private String accountNumber;
+
+    private Long managerId;
+    private Long hostelId;
 }
