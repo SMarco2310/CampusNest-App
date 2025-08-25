@@ -159,6 +159,23 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
+    public void updateBankDetails(Long userId, List<BankAccountDetailsRequestDto> bankDetails) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+
+        if (!(user instanceof Hostel_Manager manager)) {
+            throw new IllegalArgumentException("User is not a Hostel Manager");
+        }
+
+        List<BankAccountDetails> accounts = bankDetails.stream()
+                .map(this::toEntity)
+                .peek(acc -> acc.setManager(manager))   // 🔥 set back-reference
+                .toList();
+
+        manager.setBankAccountDetails(accounts);
+        userRepository.save(manager);
+    }
+
     // ===== DELETE USER =====
     @Transactional
     public void deleteUser(Long id) {
