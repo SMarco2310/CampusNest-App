@@ -238,6 +238,30 @@ public class UserService implements UserDetailsService {
                 user.getDateJoined()
         );
     }
+    private BankAccountDetails toEntity(BankAccountDetailsRequestDto dto) {
+        if (dto == null) {
+            return null;
+        }
+
+
+        BankAccountDetails entity = new BankAccountDetails();
+        entity.setAccountName(dto.getAccountName());
+        entity.setBankName(dto.getBankName());
+        entity.setBankCode(dto.getBankCode());
+        entity.setCurrency(dto.getCurrency());
+        entity.setAccountNumber(dto.getAccountNumber());
+        // ⚠️ Manager and Hostel will be set separately in the Service layer
+        if (dto.getManagerId() != null) {
+            Hostel_Manager manager = (Hostel_Manager) userRepository.findById(dto.getManagerId())
+                    .orElseThrow(() -> new RuntimeException("Manager not found"));
+            entity.setManager(manager);
+        } else if (dto.getHostelId() != null) {
+            Hostel hostel = hostelRepository.findById(dto.getHostelId())
+                    .orElseThrow(() -> new RuntimeException("Hostel not found"));
+            entity.setHostel(hostel);
+        }
+        return entity;
+    }
 
     // ===== VALIDATION =====
     private void validateRegistrationRequest(UserRegistrationRequestDto request) {
